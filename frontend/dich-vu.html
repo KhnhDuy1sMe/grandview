@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2C3A2E">
+  <meta name="description" content="Xem trước thực đơn, xe đưa đón, spa, dọn phòng và giặt là tại Grandview Hotel cùng bảng giá trước khi đến. Khách đang lưu trú gọi dịch vụ ngay trên điện thoại.">
+  <title>Dịch vụ và bảng giá | Grandview Hotel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Great+Vibes&family=Newsreader:opsz,wght@6..72,400..500&display=swap" rel="stylesheet">
+  <link rel="icon" href="grandview-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Trang dịch vụ phòng: cùng ngôn ngữ thiết kế với trang chủ (tờ giấy kem trên nền rừng). */
+    .rs-page-sheet { padding-bottom: 2rem; }
+
+    .rs-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 0; }
+    .rs-head .brand-sub { display: inline; }
+    .rs-exit { min-height: 40px; }
+
+    /* Hero: ảnh phòng, lời chào và biển số phòng */
+    .rs-hero {
+      position: relative; overflow: hidden;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 1.5rem;
+      min-height: 300px; padding: clamp(1.25rem, 3vw, 2rem);
+      border-radius: var(--radius-m); color: var(--white); background: var(--pine-soft);
+    }
+    .rs-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .rs-hero::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(18,26,20,.75), rgba(18,26,20,.25)), linear-gradient(0deg, rgba(18,26,20,.5), transparent 60%);
+    }
+    .rs-hero > * { position: relative; z-index: 1; }
+    .rs-hero .chip-row { margin-bottom: 1rem; }
+    .rs-hero h1 {
+      font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3rem); font-weight: 300;
+      line-height: 1.12; letter-spacing: -.02em; max-width: 18ch;
+    }
+    .rs-door {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-width: 132px; padding: .9rem 1.1rem;
+      border: 1px solid rgba(255,255,255,.5); border-radius: var(--radius-m);
+      background: rgba(255,255,255,.14); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .rs-door small { font-family: var(--script); font-size: 1.5rem; line-height: 1; }
+    .rs-door strong { font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem); font-weight: 300; line-height: 1; letter-spacing: -.03em; font-variant-numeric: lining-nums; }
+
+    /* Loại dịch vụ dạng viên */
+    .rs-tabs { display: flex; gap: .5rem; overflow-x: auto; margin: 1.5rem 0 0; padding-bottom: .25rem; scrollbar-width: none; }
+    .rs-tabs::-webkit-scrollbar { display: none; }
+    .rs-tabs button {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: .4rem;
+      min-height: 42px; padding: .5rem 1.1rem;
+      border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+      background: transparent; font-size: .9rem; color: var(--pine-soft);
+    }
+    .rs-tabs button:hover { border-color: var(--pine); }
+    .rs-tabs button[aria-selected="true"] { background: var(--pine); border-color: var(--pine); color: var(--white); }
+    .rs-tab-count {
+      display: inline-grid; place-items: center; min-width: 1.35rem; height: 1.35rem; padding: 0 .3rem;
+      border-radius: var(--radius-pill); background: var(--jade-light); color: var(--pine); font-size: .72rem; font-weight: 600;
+    }
+
+    .rs-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1.5rem; }
+    .rs-intro { color: var(--stone); font-size: .9rem; margin-bottom: .5rem; max-width: 60ch; }
+
+    /* Danh mục dạng bảng, giống bảng dịch vụ ở trang chủ */
+    .rs-item {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem 1.25rem; align-items: center;
+      padding: 1rem 0; border-bottom: 1px solid var(--line);
+    }
+    .rs-item-line { display: flex; align-items: baseline; gap: .6rem; min-width: 0; }
+    .rs-item-name { font-size: 1.05rem; }
+    .rs-leader { flex: 1; min-width: 1.5rem; border-bottom: 1px dashed var(--cloud); transform: translateY(-.3rem); }
+    .rs-item-price { font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .rs-item-detail { grid-column: 1; font-size: .82rem; color: var(--stone); }
+    .rs-item-control { grid-column: 2; grid-row: 1 / span 2; }
+
+    .rs-stepper { display: inline-flex; align-items: center; border: 1px solid var(--cloud); border-radius: var(--radius-pill); background: var(--paper); }
+    .rs-stepper button { width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%; background: none; font-size: 1.1rem; line-height: 1; }
+    .rs-stepper button:hover:not(:disabled) { background: var(--jade-tint); }
+    .rs-stepper button:disabled { opacity: .3; cursor: default; }
+    .rs-stepper output { min-width: 1.6rem; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .rs-add {
+      min-height: 40px; padding: .45rem 1.1rem;
+      border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+      background: transparent; font-size: .85rem; font-weight: 500;
+    }
+    .rs-add:hover { border-color: var(--pine); background: var(--paper); }
+    .rs-pick[aria-pressed="true"] { background: var(--jade); border-color: var(--jade); color: var(--white); }
+
+    /* Cột phải */
+    .rs-side { position: sticky; top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+    .rs-panel { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 1.25rem; }
+    .rs-panel-dark { background: var(--pine); border-color: var(--pine); color: rgba(255,255,255,.9); }
+    .rs-panel h2 { font-size: 1.35rem; font-weight: 300; color: var(--moss); margin-bottom: .8rem; }
+    .rs-panel-dark h2 { color: var(--white); }
+    .rs-lines { margin: 0 0 .75rem; font-size: .9rem; }
+    .rs-lines li { display: flex; justify-content: space-between; gap: 1rem; padding: .3rem 0; }
+    .rs-lines span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .rs-empty { font-size: .88rem; opacity: .75; margin-bottom: .75rem; }
+    .rs-total { display: flex; justify-content: space-between; padding: .7rem 0; border-top: 1px solid rgba(255,255,255,.2); font-weight: 600; }
+    .rs-total span:last-child { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .rs-fields { display: flex; flex-direction: column; gap: .75rem; margin: .75rem 0; }
+    .rs-fields label { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; font-weight: 500; }
+    .rs-fields label small { font-weight: 400; opacity: .7; }
+    .rs-fields input, .rs-fields textarea {
+      width: 100%; padding: .65rem .9rem; border: 1px solid transparent; border-radius: 12px;
+      background: var(--white); color: var(--pine); font-size: .92rem; font-weight: 400;
+    }
+    .rs-fields input:focus, .rs-fields textarea:focus { outline: none; box-shadow: 0 0 0 3px var(--jade-light); }
+    .rs-error { min-height: 1.2em; font-size: .82rem; color: #F2B8AE; margin-bottom: .5rem; }
+    .rs-error:empty { min-height: 0; margin: 0; }
+    .rs-submit { width: 100%; background: var(--jade-light); color: var(--pine); }
+    .rs-submit:hover { background: var(--white); }
+    .rs-bill-note { margin-top: .7rem; font-size: .76rem; opacity: .7; }
+
+    .rs-request { padding: .85rem 0; border-top: 1px solid var(--line); font-size: .88rem; }
+    .rs-request:first-child { border-top: 0; padding-top: 0; }
+    .rs-request-head { display: flex; justify-content: space-between; align-items: baseline; gap: .75rem; margin-bottom: .25rem; }
+    .rs-request-head strong { font-weight: 600; }
+    .rs-request-meta { color: var(--stone); font-size: .8rem; margin-top: .2rem; }
+    .rs-request-foot { display: flex; justify-content: space-between; align-items: center; gap: .75rem; margin-top: .35rem; }
+    .rs-cancel { border: 0; background: none; padding: 0; color: var(--st-maintenance); font-size: .8rem; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Chế độ xem trước: khách chưa lưu trú chỉ xem danh mục và giá */
+    .rs-item-preview { grid-template-columns: minmax(0, 1fr); }
+    .rs-steps { counter-reset: step; margin: 0 0 1.1rem; padding: 0; list-style: none; font-size: .9rem; }
+    .rs-steps li { counter-increment: step; display: grid; grid-template-columns: 1.8rem minmax(0, 1fr); gap: .5rem; padding: .45rem 0; }
+    .rs-steps li::before {
+      content: counter(step); display: grid; place-items: center; width: 1.6rem; height: 1.6rem;
+      border: 1px solid rgba(255,255,255,.45); border-radius: 50%; font-size: .78rem; font-weight: 600;
+    }
+    .rs-actions { display: flex; flex-direction: column; gap: .6rem; }
+    .rs-actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; text-decoration: none; }
+    .rs-ghost {
+      padding: .55rem 1.1rem; border: 1px solid rgba(255,255,255,.45); border-radius: var(--radius-pill);
+      color: var(--white); font-size: .9rem; font-weight: 500;
+    }
+    .rs-ghost:hover { background: rgba(255,255,255,.12); }
+    .rs-blocked-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+
+    .rs-mobile-bar { display: none; }
+    .rs-blocked { max-width: 52ch; padding: 3rem 0 4rem; }
+    .rs-blocked h1 { font-size: 2rem; font-weight: 300; color: var(--moss); margin-bottom: .6rem; }
+    .rs-blocked p { color: var(--stone); margin-bottom: 1.25rem; }
+    .rs-loading { padding: 4rem 0; color: var(--stone); }
+
+    @media (max-width: 860px) {
+      .rs-layout { grid-template-columns: 1fr; gap: 1.25rem; }
+      .rs-side { position: static; }
+      .rs-hero { grid-template-columns: 1fr; min-height: 340px; }
+      .rs-door { position: absolute; top: 1.25rem; right: 1.25rem; min-width: 0; padding: .6rem .85rem; }
+      .rs-door strong { font-size: 2.2rem; }
+      .rs-hero .chip-row { max-width: calc(100% - 7rem); }
+      .rs-head .brand-sub { display: none; }
+      .rs-page-sheet { padding-bottom: 6rem; }
+      .rs-mobile-bar {
+        position: fixed; left: .75rem; right: .75rem; bottom: calc(.75rem + env(safe-area-inset-bottom, 0px)); z-index: 40;
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        padding: .5rem .5rem .5rem 1.1rem; border-radius: var(--radius-pill);
+        background: var(--pine); color: var(--white); box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      }
+      .rs-mobile-bar[hidden] { display: none; }
+      .rs-mobile-bar span { font-size: .88rem; }
+      .rs-mobile-bar button { min-height: 40px; padding: .5rem 1.1rem; border: 0; border-radius: var(--radius-pill); background: var(--jade-light); color: var(--pine); font-weight: 600; font-size: .85rem; }
+      .toast { bottom: 5.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page rs-page-sheet">
+  <header class="rs-head">
+    <a class="brand" href="/" aria-label="Grandview Hotel, về trang chủ">
+      <span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="mark-arch" d="M8 60V30a24 24 0 0 1 48 0v30z"/><circle class="mark-sun" cx="41" cy="25" r="6"/><path class="mark-tree" d="M15 52l9-20 9 20z M27 52l8-15 8 15z M37 52l7-12 7 12z"/><rect class="mark-ground" x="12" y="52" width="40" height="2.5" rx="1.25"/></svg></span>
+      <span class="brand-words">
+        <span class="brand-mark">Grandview</span>
+        <span class="brand-sub">Khách sạn &amp; nghỉ dưỡng</span>
+      </span>
+    </a>
+    <button class="secondary-button rs-exit" id="exitButton" type="button">Về trang chủ</button>
+  </header>
+
+  <div id="page">
+    <p class="rs-loading" id="loadingState">Đang tải danh mục dịch vụ…</p>
+
+    <section class="rs-blocked" id="blockedState" hidden>
+      <h1 id="blockedTitle">Dịch vụ phòng chưa mở</h1>
+      <p id="blockedText"></p>
+      <div class="rs-blocked-actions">
+        <a class="gold-btn" href="/#room-service">Nhập lại số điện thoại</a>
+        <a class="secondary-button" href="/dich-vu.html">Xem bảng dịch vụ</a>
+      </div>
+    </section>
+
+    <div id="serviceApp" hidden>
+      <section class="rs-hero" aria-label="Thông tin lưu trú">
+        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=70" alt="" width="1400" height="600">
+        <div>
+          <ul class="chip-row" id="stayChips"></ul>
+          <h1 id="plateGreeting"></h1>
+        </div>
+        <div class="rs-door" id="roomDoor" aria-label="Số phòng" hidden>
+          <small>Phòng</small>
+          <strong id="plateRoom"></strong>
+        </div>
+        <p class="sr-only" id="plateStay"></p>
+      </section>
+
+      <nav class="rs-tabs" role="tablist" aria-label="Loại dịch vụ" id="categoryTabs"></nav>
+
+      <div class="rs-layout">
+        <section aria-live="polite">
+          <p class="rs-intro" id="categoryIntro"></p>
+          <ul class="rs-menu" id="menuList"></ul>
+        </section>
+
+        <aside class="rs-side">
+          <section class="rs-panel rs-panel-dark" id="previewPanel" aria-labelledby="previewTitle" hidden>
+            <h2 id="previewTitle">Gọi dịch vụ khi lưu trú</h2>
+            <ol class="rs-steps">
+              <li>Đặt phòng trên website và ghi nhớ số điện thoại đã dùng.</li>
+              <li>Lễ tân làm thủ tục nhận phòng khi bạn đến.</li>
+              <li>Nhập số điện thoại ở mục Dịch vụ phòng để gọi món, đặt xe, hẹn spa hoặc dọn phòng.</li>
+              <li>Chi phí cộng vào hóa đơn phòng, thanh toán một lần khi trả phòng.</li>
+            </ol>
+            <div class="rs-actions">
+              <a class="gold-btn rs-submit" href="/#booking">Đặt phòng</a>
+              <a class="rs-ghost" href="/#room-service">Đang lưu trú? Vào dịch vụ phòng</a>
+            </div>
+            <p class="rs-bill-note">Giá có thể thay đổi theo mùa. Giá áp dụng là giá hiển thị lúc bạn gửi yêu cầu.</p>
+          </section>
+
+          <form class="rs-panel rs-panel-dark" id="orderForm" novalidate hidden>
+            <h2 id="orderTitle">Yêu cầu của bạn</h2>
+            <ul class="rs-lines" id="orderLines"></ul>
+            <p class="rs-empty" id="orderEmpty">Chọn dịch vụ ở danh sách bên cạnh.</p>
+            <div class="rs-total"><span>Tạm tính</span><span id="orderTotal">0 ₫</span></div>
+            <div class="rs-fields">
+              <label id="timeField">
+                <span id="timeLabel">Thời gian mong muốn <small>(để trống nếu cần ngay)</small></span>
+                <input id="scheduledAt" type="datetime-local">
+              </label>
+              <label id="destinationField" hidden>
+                Điểm đến
+                <input id="destination" type="text" maxlength="255" placeholder="Ví dụ: Sân bay Nội Bài, ga quốc nội">
+              </label>
+              <label>
+                <span>Ghi chú <small>(không bắt buộc)</small></span>
+                <textarea id="orderNote" rows="2" maxlength="500" placeholder="Ví dụ: không hành, 2 vali lớn, cần ghế trẻ em"></textarea>
+              </label>
+            </div>
+            <p class="rs-error" id="orderError" role="alert"></p>
+            <button class="gold-btn rs-submit" id="orderSubmit" type="submit">Gửi yêu cầu</button>
+            <p class="rs-bill-note">Chi phí được cộng vào hóa đơn phòng và thanh toán khi trả phòng.</p>
+          </form>
+
+          <section class="rs-panel" id="requestsPanel" aria-labelledby="requestsTitle" hidden>
+            <h2 id="requestsTitle">Đã gửi</h2>
+            <ul class="rs-requests" id="requestList"><li class="rs-empty">Bạn chưa gửi yêu cầu nào.</li></ul>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="rs-mobile-bar" id="mobileBar" hidden>
+    <span id="mobileSummary"></span>
+    <button type="button" id="mobileReview">Xem và gửi</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (() => {
+    const GUEST_TOKEN_KEY = "gv_guest_token";
+    const guestToken = sessionStorage.getItem(GUEST_TOKEN_KEY);
+    // Không có phiên khách lưu trú: mở chế độ xem trước (chỉ xem danh mục và giá, không gửi yêu cầu).
+    const isPreview = !guestToken;
+    const statusLabels = { pending: "Chờ tiếp nhận", in_progress: "Đang xử lý", completed: "Đã hoàn tất", cancelled: "Đã hủy" };
+
+    const state = { session: null, catalog: [], active: null, carts: {} };
+    let toastTimer;
+    let pollTimer;
+
+    const $ = selector => document.querySelector(selector);
+    const escapeHtml = (value = "") => String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[c]);
+    const money = value => Number(value) === 0 ? "Miễn phí"
+      : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(Number(value));
+    const formatDate = value => value ? new Intl.DateTimeFormat("vi-VN").format(new Date(`${String(value).slice(0, 10)}T00:00:00`)) : "";
+    const formatDateTime = value => value ? `${String(value).slice(11, 16)}, ${formatDate(value)}` : "";
+
+    function notify(message, isError = false) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.toggle("error", isError);
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 4500);
+    }
+
+    async function api(url, body, method = "POST") {
+      const headers = guestToken ? { Authorization: `Bearer ${guestToken}` } : {};
+      if (body) headers["Content-Type"] = "application/json";
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = Array.isArray(data.detail)
+          ? data.detail.map(item => item.msg || "Dữ liệu không hợp lệ").join("; ")
+          : (data.detail || `Có lỗi xảy ra (${response.status}).`);
+        const error = new Error(message);
+        error.status = response.status;
+        throw error;
+      }
+      return data;
+    }
+
+    function exit() {
+      if (isPreview) { window.location.href = "/#services"; return; }
+      sessionStorage.removeItem(GUEST_TOKEN_KEY);
+      window.location.href = "/#room-service";
+    }
+    $("#exitButton").addEventListener("click", exit);
+
+    function handleSessionError(error, always = false) {
+      if (error.status === 401) {
+        sessionStorage.removeItem(GUEST_TOKEN_KEY);
+        showBlocked("Phiên đã hết hạn", "Vui lòng nhập lại số điện thoại người đặt phòng để tiếp tục.");
+      } else if (error.status === 403) {
+        sessionStorage.removeItem(GUEST_TOKEN_KEY);
+        showBlocked("Dịch vụ phòng đã đóng", error.message);
+      } else if (always) {
+        showBlocked("Chưa mở được dịch vụ phòng", error.message);
+      }
+    }
+
+    function showBlocked(title, text) {
+      $("#loadingState").hidden = true;
+      $("#serviceApp").hidden = true;
+      $("#blockedTitle").textContent = title;
+      $("#blockedText").textContent = text;
+      $("#blockedState").hidden = false;
+      $("#mobileBar").hidden = true;
+      clearInterval(pollTimer);
+    }
+
+    // ---------- Giỏ yêu cầu ----------
+    const activeCategory = () => state.catalog.find(c => c.id === state.active);
+    const cartOf = id => (state.carts[id] ||= {});
+
+    function cartLines(category) {
+      const cart = cartOf(category.id);
+      return category.items
+        .filter(item => cart[item.id] > 0)
+        .map(item => ({ ...item, quantity: cart[item.id] }));
+    }
+
+    function setQuantity(itemId, quantity) {
+      const category = activeCategory();
+      const cart = cartOf(category.id);
+      if (category.single_item) {
+        Object.keys(cart).forEach(key => delete cart[key]);
+        if (quantity > 0) cart[itemId] = 1;
+      } else if (quantity <= 0) {
+        delete cart[itemId];
+      } else {
+        cart[itemId] = Math.min(20, quantity);
+      }
+      renderMenu();
+      renderOrder();
+      renderTabs();
+    }
+
+    // ---------- Hiển thị ----------
+    function renderTabs() {
+      $("#categoryTabs").innerHTML = state.catalog.map(category => {
+        const count = Object.values(cartOf(category.id)).reduce((sum, n) => sum + n, 0);
+        return `<button role="tab" type="button" data-category="${escapeHtml(category.id)}"
+                  aria-selected="${category.id === state.active}">
+                  ${escapeHtml(category.label)}${count ? `<span class="rs-tab-count">${count}</span>` : ""}
+                </button>`;
+      }).join("");
+    }
+
+    function renderMenu() {
+      const category = activeCategory();
+      const cart = cartOf(category.id);
+      $("#categoryIntro").textContent = category.description;
+      $("#menuList").innerHTML = category.items.map(item => {
+        const quantity = cart[item.id] || 0;
+        if (isPreview) {
+          return `<li class="rs-item rs-item-preview">
+            <div class="rs-item-line">
+              <span class="rs-item-name">${escapeHtml(item.name)}</span>
+              <span class="rs-leader" aria-hidden="true"></span>
+              <span class="rs-item-price">${escapeHtml(item.price_label || money(item.price))}</span>
+            </div>
+            ${item.detail ? `<div class="rs-item-detail">${escapeHtml(item.detail)}</div>` : ""}
+          </li>`;
+        }
+        let control;
+        if (category.single_item) {
+          control = `<button class="rs-add rs-pick" type="button" data-pick="${escapeHtml(item.id)}" aria-pressed="${quantity > 0}">
+                       ${quantity > 0 ? "Đã chọn" : "Chọn"}</button>`;
+        } else if (quantity === 0) {
+          control = `<button class="rs-add" type="button" data-set="${escapeHtml(item.id)}" data-qty="1"
+                       aria-label="Thêm ${escapeHtml(item.name)}">Thêm</button>`;
+        } else {
+          control = `<div class="rs-stepper">
+                       <button type="button" data-set="${escapeHtml(item.id)}" data-qty="${quantity - 1}" aria-label="Bớt một ${escapeHtml(item.name)}">−</button>
+                       <output aria-label="Số lượng ${escapeHtml(item.name)}">${quantity}</output>
+                       <button type="button" data-set="${escapeHtml(item.id)}" data-qty="${quantity + 1}" ${quantity >= 20 ? "disabled" : ""} aria-label="Thêm một ${escapeHtml(item.name)}">+</button>
+                     </div>`;
+        }
+        return `<li class="rs-item">
+          <div class="rs-item-line">
+            <span class="rs-item-name">${escapeHtml(item.name)}</span>
+            <span class="rs-leader" aria-hidden="true"></span>
+            <span class="rs-item-price">${escapeHtml(item.price_label || money(item.price))}</span>
+          </div>
+          <div class="rs-item-control">${control}</div>
+          ${item.detail ? `<div class="rs-item-detail">${escapeHtml(item.detail)}</div>` : ""}
+        </li>`;
+      }).join("");
+    }
+
+    function renderOrder() {
+      if (isPreview) return;
+      const category = activeCategory();
+      const lines = cartLines(category);
+      const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
+      $("#orderTitle").textContent = `Yêu cầu ${category.label.toLowerCase()}`;
+      $("#orderLines").innerHTML = lines.map(line =>
+        `<li><span>${escapeHtml(line.name)}${category.single_item ? "" : ` × ${line.quantity}`}</span><span>${escapeHtml(line.price_label || money(line.price * line.quantity))}</span></li>`).join("");
+      $("#orderEmpty").hidden = lines.length > 0;
+      $("#orderEmpty").textContent = category.single_item ? "Chọn một chuyến xe ở danh sách." : "Chọn dịch vụ ở danh sách.";
+      $("#orderTotal").textContent = total ? money(total) : (lines.length ? "Miễn phí" : "0 ₫");
+
+      $("#destinationField").hidden = !category.needs_destination;
+      $("#destination").required = category.needs_destination;
+
+      const count = lines.reduce((sum, line) => sum + line.quantity, 0);
+      $("#mobileBar").hidden = count === 0;
+      $("#mobileSummary").textContent = count ? `${count} mục, ${total ? money(total) : "miễn phí"}` : "";
+    }
+
+    function selectCategory(id) {
+      if (!state.catalog.some(c => c.id === id)) id = state.catalog[0].id;
+      state.active = id;
+      if (isPreview && location.hash !== `#${id}`) history.replaceState(null, "", `#${id}`);
+      $("#orderError").textContent = "";
+      renderTabs();
+      renderMenu();
+      renderOrder();
+    }
+
+    function renderRequests(requests) {
+      const list = $("#requestList");
+      if (!requests.length) {
+        list.innerHTML = '<li class="rs-empty">Bạn chưa gửi yêu cầu nào.</li>';
+        return;
+      }
+      list.innerHTML = requests.map(request => `
+        <li class="rs-request">
+          <div class="rs-request-head">
+            <strong>${escapeHtml(request.category_label)}</strong>
+            <span class="status-badge ${escapeHtml(request.status)}">${escapeHtml(statusLabels[request.status] || request.status)}</span>
+          </div>
+          <div>${request.items.map(item => `${escapeHtml(item.name)} × ${Number(item.quantity)}`).join(", ")}</div>
+          <div class="rs-request-meta">${request.scheduled_at ? `Hẹn lúc ${formatDateTime(request.scheduled_at)}` : "Cần ngay"}</div>
+          ${request.destination ? `<div class="rs-request-meta">Đến ${escapeHtml(request.destination)}</div>` : ""}
+          <div class="rs-request-foot">
+            <span class="rs-request-meta">Gửi lúc ${formatDateTime(request.created_at)}, ${money(request.total_price)}</span>
+            ${request.status === "pending" ? `<button class="rs-cancel" type="button" data-cancel="${Number(request.id)}">Hủy yêu cầu</button>` : ""}
+          </div>
+        </li>`).join("");
+    }
+
+    async function loadRequests() {
+      try {
+        renderRequests(await api("/api/guest/service-requests", null, "GET"));
+      } catch (error) {
+        handleSessionError(error);
+      }
+    }
+
+    // ---------- Sự kiện ----------
+    $("#categoryTabs").addEventListener("click", event => {
+      const tab = event.target.closest("[data-category]");
+      if (tab) selectCategory(tab.dataset.category);
+    });
+
+    $("#menuList").addEventListener("click", event => {
+      const set = event.target.closest("[data-set]");
+      if (set) { setQuantity(set.dataset.set, Number(set.dataset.qty)); return; }
+      const pick = event.target.closest("[data-pick]");
+      if (pick) setQuantity(pick.dataset.pick, pick.getAttribute("aria-pressed") === "true" ? 0 : 1);
+    });
+
+    $("#mobileReview").addEventListener("click", () => {
+      $("#orderForm").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    $("#orderForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const category = activeCategory();
+      const lines = cartLines(category);
+      const error = $("#orderError");
+      error.textContent = "";
+      if (!lines.length) { error.textContent = category.single_item ? "Vui lòng chọn một chuyến xe." : "Vui lòng chọn ít nhất một dịch vụ."; return; }
+      const scheduledAt = $("#scheduledAt").value;
+      const destination = $("#destination").value.trim();
+      if (category.needs_destination && !destination) { error.textContent = "Vui lòng nhập điểm đến."; $("#destination").focus(); return; }
+
+      const submit = $("#orderSubmit");
+      submit.disabled = true;
+      submit.textContent = "Đang gửi...";
+      try {
+        await api("/api/guest/service-requests", {
+          category: category.id,
+          items: lines.map(line => ({ item_id: line.id, quantity: line.quantity })),
+          scheduled_at: scheduledAt || null,
+          destination: category.needs_destination ? destination : null,
+          note: $("#orderNote").value.trim() || null,
+        });
+        state.carts[category.id] = {};
+        $("#orderNote").value = "";
+        $("#destination").value = "";
+        $("#scheduledAt").value = "";
+        selectCategory(category.id);
+        notify(scheduledAt ? "Đã gửi yêu cầu. Lễ tân sẽ xác nhận giờ hẹn với bạn." : "Đã gửi yêu cầu. Nhân viên sẽ phục vụ ngay khi có thể.");
+        await loadRequests();
+      } catch (err) {
+        if (err.status === 401 || err.status === 403) {
+          handleSessionError(err);
+        } else {
+          error.textContent = err.message;
+        }
+      } finally {
+        submit.disabled = false;
+        submit.textContent = "Gửi yêu cầu";
+      }
+    });
+
+    $("#requestList").addEventListener("click", async event => {
+      const button = event.target.closest("[data-cancel]");
+      if (!button || !window.confirm("Hủy yêu cầu này?")) return;
+      button.disabled = true;
+      try {
+        await api(`/api/guest/service-requests/${Number(button.dataset.cancel)}/cancel`, {});
+        notify("Đã hủy yêu cầu.");
+      } catch (err) {
+        notify(err.message, true);
+      }
+      loadRequests();
+    });
+
+    // Liên kết từ trang chủ (dich-vu.html#spa) mở thẳng nhóm dịch vụ tương ứng
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.slice(1);
+      if (state.catalog.length && id && id !== state.active) selectCategory(id);
+    });
+
+    // ---------- Khởi động ----------
+    function minDateTimeValue() {
+      const now = new Date(Date.now() + 10 * 60000);
+      return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    }
+
+    async function startPreview() {
+      try {
+        const catalog = await api("/api/services/catalog", null, "GET");
+        if (!catalog.length) throw new Error("Danh mục dịch vụ đang được cập nhật.");
+        state.catalog = catalog;
+        const itemCount = catalog.reduce((sum, category) => sum + category.items.length, 0);
+        $("#plateGreeting").textContent = "Xem trước dịch vụ trước khi đến Grandview";
+        $("#stayChips").innerHTML = [
+          `${catalog.length} nhóm dịch vụ`,
+          `${itemCount} lựa chọn`,
+          "Thanh toán khi trả phòng",
+        ].map(text => `<li class="chip chip-glass">${escapeHtml(text)}</li>`).join("");
+        $("#previewPanel").hidden = false;
+        $("#loadingState").hidden = true;
+        $("#serviceApp").hidden = false;
+        selectCategory(location.hash.slice(1) || catalog[0].id);
+      } catch (error) {
+        showBlocked("Chưa tải được danh mục dịch vụ", `${error.message} Vui lòng tải lại trang sau ít phút.`);
+      }
+    }
+
+    async function start() {
+      if (isPreview) { startPreview(); return; }
+      try {
+        const [session, catalog] = await Promise.all([
+          api("/api/guest/me", null, "GET"),
+          api("/api/services/catalog", null, "GET"),
+        ]);
+        state.session = session;
+        state.catalog = catalog;
+        $("#plateRoom").textContent = session.room_number;
+        $("#roomDoor").hidden = false;
+        $("#exitButton").textContent = "Thoát";
+        $("#orderForm").hidden = false;
+        $("#requestsPanel").hidden = false;
+        $("#plateGreeting").innerHTML = `Chào ${escapeHtml(session.customer_name)}, hôm nay bạn <em class="script">cần gì</em>?`;
+        $("#plateStay").textContent = `${session.room_type}, trả phòng ngày ${formatDate(session.check_out)}.`;
+        $("#stayChips").innerHTML = [
+          session.room_type,
+          `${Number(session.guests)} khách`,
+          `Trả phòng ${formatDate(session.check_out)}`,
+        ].map(text => `<li class="chip chip-glass">${escapeHtml(text)}</li>`).join("");
+        $("#scheduledAt").min = minDateTimeValue();
+        $("#loadingState").hidden = true;
+        $("#serviceApp").hidden = false;
+        selectCategory(location.hash.slice(1) || catalog[0].id);
+        loadRequests();
+        pollTimer = setInterval(loadRequests, 20000);
+      } catch (error) {
+        handleSessionError(error, true);
+      }
+    }
+
+    start();
+  })();
+  </script>
+</body>
+</html>

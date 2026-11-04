@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Trung tâm vận hành Grandview Hotel.">
+  <meta name="theme-color" content="#1D2620">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Quản lý vận hành | Grandview Hotel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Great+Vibes&family=Newsreader:opsz,wght@6..72,400..500&display=swap" rel="stylesheet">
+  <link rel="icon" href="grandview-mark-reverse.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="management.css">
+</head>
+<body>
+  <div class="management-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand brand-reverse" href="/" aria-label="Grandview Hotel, về trang khách sạn">
+        <span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="mark-arch" d="M8 60V30a24 24 0 0 1 48 0v30z"/><circle class="mark-sun" cx="41" cy="25" r="6"/><path class="mark-tree" d="M15 52l9-20 9 20z M27 52l8-15 8 15z M37 52l7-12 7 12z"/><rect class="mark-ground" x="12" y="52" width="40" height="2.5" rx="1.25"/></svg></span>
+        <span class="brand-words">
+          <span class="brand-name">Grandview</span>
+          <span class="brand-sub">Vận hành</span>
+        </span>
+      </a>
+
+      <nav class="side-nav" aria-label="Điều hướng quản lý">
+        <button class="nav-item" type="button" data-view="overview" id="overviewNav">
+          <span>Tổng quan</span>
+        </button>
+        <button class="nav-item" type="button" data-view="rooms">
+          <span>Quản lý phòng</span>
+        </button>
+        <button class="nav-item" type="button" data-view="bookings">
+          <span>Đơn đặt phòng</span><span class="nav-count" id="pendingNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="services">
+          <span>Dịch vụ phòng</span><span class="nav-count" id="serviceNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="history">
+          <span>Lịch sử đơn</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a class="back-link" href="/">Về trang khách sạn</a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" type="button" aria-label="Mở menu" aria-controls="sidebar" aria-expanded="false">
+          <span></span><span></span>
+        </button>
+        <div class="topbar-heading">
+          <h1 id="pageTitle">Tổng quan vận hành</h1>
+          <span class="today-label" id="todayLabel"></span>
+        </div>
+        <div class="topbar-actions">
+          <div class="profile-chip">
+            <span class="avatar" id="userInitial" aria-hidden="true">G</span>
+            <span class="profile-copy"><strong id="userName">Đang tải…</strong><small id="userRole"></small></span>
+          </div>
+          <button class="logout-button" id="logoutButton" type="button">Đăng xuất</button>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <!-- ===== Tổng quan ===== -->
+        <section class="view-panel" id="overviewView" hidden>
+          <div class="welcome-row">
+            <p class="muted">Tình hình hoạt động của khách sạn trong hôm nay.</p>
+            <button class="primary-button" type="button" data-open-view="bookings">Xử lý đơn chờ xác nhận</button>
+          </div>
+
+          <div class="stats-grid" id="statsGrid">
+            <article class="stat-card stat-card-key">
+              <span class="stat-label">Đơn chờ xác nhận</span>
+              <strong class="stat-value" id="statPending">—</strong>
+              <span class="stat-foot">Cần lễ tân xử lý</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Phòng đang có khách</span>
+              <strong class="stat-value" id="statOccupiedRooms">—</strong>
+              <span class="stat-foot">Theo lịch lưu trú hôm nay</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Tổng số phòng</span>
+              <strong class="stat-value" id="statTotalRooms">—</strong>
+              <span class="stat-foot">Phòng đang hoạt động</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Công suất phòng</span>
+              <strong class="stat-value" id="statOccupancy">—</strong>
+              <span class="stat-foot">Tỷ lệ lấp đầy hôm nay</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Đơn tạo hôm nay</span>
+              <strong class="stat-value" id="statToday">—</strong>
+              <span class="stat-foot">Đơn mới trong ngày</span>
+            </article>
+            <article class="stat-card stat-card-wide">
+              <span class="stat-label">Doanh thu đơn đã hoàn tất</span>
+              <strong class="stat-value" id="statRevenue">—</strong>
+              <span class="stat-foot">Tiền phòng và dịch vụ của các đơn đã trả phòng</span>
+            </article>
+          </div>
+
+          <div class="overview-bottom">
+            <article class="surface-card occupancy-card">
+              <div class="card-heading">
+                <h3>Công suất sử dụng phòng</h3>
+                <span class="period-pill">Hôm nay</span>
+              </div>
+              <div class="occupancy-number"><strong id="occupancyBig">—</strong><span>phòng đã có khách</span></div>
+              <div class="progress-track" role="presentation"><span id="occupancyProgress"></span></div>
+              <p class="muted" id="occupancyDescription">Đang tải dữ liệu…</p>
+            </article>
+            <article class="surface-card quick-card">
+              <h3>Đi đến</h3>
+              <button class="quick-link" type="button" data-open-view="rooms">
+                <span><strong>Quản lý phòng</strong><small>Xem và cập nhật trạng thái từng phòng</small></span>
+              </button>
+              <button class="quick-link" type="button" data-open-view="bookings">
+                <span><strong>Đơn đặt phòng</strong><small>Xác nhận yêu cầu mới, nhận khách và trả phòng</small></span>
+              </button>
+              <button class="quick-link" type="button" data-open-view="services">
+                <span><strong>Dịch vụ phòng</strong><small>Đồ ăn, đặt xe, dọn phòng và spa khách vừa gọi</small></span>
+              </button>
+              <button class="quick-link" type="button" data-open-view="history">
+                <span><strong>Lịch sử đơn</strong><small>Tra cứu đơn cũ và thông tin khách</small></span>
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <!-- ===== Phòng ===== -->
+        <section class="view-panel" id="roomsView" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Sơ đồ trạng thái phòng</h2>
+              <p class="muted">Đổi tình trạng ngay trên từng ô, hoặc mở phòng để xem khách đang ở và lịch sử.</p>
+            </div>
+            <button class="secondary-button" id="refreshRooms" type="button">Làm mới</button>
+          </div>
+          <div class="legend-row" aria-label="Chú thích trạng thái">
+            <span><i class="legend-dot available"></i>Trống</span>
+            <span><i class="legend-dot occupied"></i>Đang có khách</span>
+            <span><i class="legend-dot cleaning"></i>Chờ dọn</span>
+            <span><i class="legend-dot maintenance"></i>Bảo trì</span>
+          </div>
+          <div class="room-board" id="roomBoard"><div class="loading-state">Đang tải danh sách phòng…</div></div>
+        </section>
+
+        <!-- ===== Đơn đặt phòng ===== -->
+        <section class="view-panel" id="bookingsView" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Yêu cầu đặt phòng</h2>
+              <p class="muted">Các yêu cầu đang chờ lễ tân xác nhận hoặc từ chối.</p>
+            </div>
+            <button class="secondary-button" id="refreshBookings" type="button">Làm mới</button>
+          </div>
+          <div class="booking-summary" id="bookingSummary">Đang tải yêu cầu…</div>
+          <div class="surface-card table-card">
+            <div class="table-scroll">
+              <table class="booking-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Mã đặt phòng</th>
+                    <th scope="col">Khách hàng</th>
+                    <th scope="col">Phòng</th>
+                    <th scope="col">Thời gian lưu trú</th>
+                    <th scope="col">Khách</th>
+                    <th scope="col" class="num">Tổng tiền</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingTableBody"><tr><td colspan="7" class="empty-cell">Đang tải dữ liệu…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section-header subsection-header">
+            <div>
+              <h2>Chờ nhận khách và đang lưu trú</h2>
+              <p class="muted">Đơn đã xác nhận chờ khách đến, và các phòng đang có khách chờ trả phòng.</p>
+            </div>
+          </div>
+          <div class="surface-card table-card">
+            <div class="table-scroll">
+              <table class="booking-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Mã đặt phòng</th>
+                    <th scope="col">Khách hàng</th>
+                    <th scope="col">Phòng</th>
+                    <th scope="col">Thời gian lưu trú</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col" class="num">Tổng tiền</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="activeTableBody"><tr><td colspan="7" class="empty-cell">Đang tải dữ liệu…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Dịch vụ phòng ===== -->
+        <section class="view-panel" id="servicesView" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Yêu cầu dịch vụ phòng</h2>
+              <p class="muted">Khách gửi từ trang dịch vụ phòng. Danh sách tự làm mới mỗi 30 giây.</p>
+            </div>
+            <button class="secondary-button" id="refreshServices" type="button">Làm mới</button>
+          </div>
+          <div class="segmented" role="group" aria-label="Lọc yêu cầu" id="serviceFilter">
+            <button type="button" data-service-filter="open" aria-pressed="true">Cần xử lý</button>
+            <button type="button" data-service-filter="completed" aria-pressed="false">Đã hoàn tất</button>
+            <button type="button" data-service-filter="cancelled" aria-pressed="false">Đã hủy</button>
+            <button type="button" data-service-filter="all" aria-pressed="false">Tất cả</button>
+          </div>
+          <div class="service-list" id="serviceList"><div class="loading-state">Đang tải yêu cầu…</div></div>
+        </section>
+
+        <!-- ===== Lịch sử đơn ===== -->
+        <section class="view-panel" id="historyView" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Lịch sử đơn đặt phòng</h2>
+              <p class="muted">Mọi đơn ở mọi trạng thái. Bấm vào một dòng để xem chi tiết khách.</p>
+            </div>
+          </div>
+          <form class="filter-bar" id="historyFilter">
+            <label class="filter-search">Tìm kiếm
+              <input name="q" type="search" placeholder="Tên, số điện thoại, email, mã đơn hoặc số phòng">
+            </label>
+            <label>Trạng thái
+              <select name="status">
+                <option value="">Tất cả</option>
+                <option value="pending">Chờ xác nhận</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="checked_in">Đang lưu trú</option>
+                <option value="checked_out">Đã trả phòng</option>
+                <option value="cancelled">Đã hủy</option>
+                <option value="rejected">Đã từ chối</option>
+              </select>
+            </label>
+            <label>Phòng
+              <select name="room_id" id="historyRoomFilter"><option value="">Tất cả</option></select>
+            </label>
+            <label>Từ ngày<input name="date_from" type="date"></label>
+            <label>Đến ngày<input name="date_to" type="date"></label>
+            <div class="filter-actions">
+              <button class="primary-button" type="submit">Lọc</button>
+              <button class="secondary-button" type="reset">Xóa lọc</button>
+            </div>
+          </form>
+          <div class="surface-card table-card">
+            <div class="table-scroll">
+              <table class="booking-table history-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Mã đặt phòng</th>
+                    <th scope="col">Khách hàng</th>
+                    <th scope="col">Phòng</th>
+                    <th scope="col">Thời gian lưu trú</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col" class="num">Tổng tiền</th>
+                    <th scope="col">Ngày đặt</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody"><tr><td colspan="7" class="empty-cell">Đang tải dữ liệu…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="pager">
+            <span id="historyPagerInfo"></span>
+            <div>
+              <button class="secondary-button" id="historyPrev" type="button">Trang trước</button>
+              <button class="secondary-button" id="historyNext" type="button">Trang sau</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="toast" id="managementToast" role="status" aria-live="polite"></div>
+      </div>
+
+      <footer class="main-footer">
+        <span>© 2026 Grandview Hotel</span>
+        <span>Hệ thống quản lý dịch vụ khách sạn, bản phục vụ đồ án</span>
+      </footer>
+    </main>
+  </div>
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+  <!-- ===== Ngăn chi tiết (phòng / đơn) ===== -->
+  <div class="drawer-scrim" id="drawerScrim"></div>
+  <aside class="detail-drawer" id="detailDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+    <header class="drawer-head">
+      <div>
+        <h2 id="drawerTitle"></h2>
+        <div class="drawer-sub" id="drawerSub"></div>
+      </div>
+      <button class="drawer-close" id="drawerClose" type="button" aria-label="Đóng">×</button>
+    </header>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+  <div class="print-area" id="printArea" aria-hidden="true"></div>
+  <script src="management.js"></script>
+</body>
+</html>

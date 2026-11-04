@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500" role="img" aria-label="Biệt thự, ảnh minh họa">
+  <title>Biệt thự, ảnh minh họa</title>
+  <defs><linearGradient id="scrimvilla" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1D2620" stop-opacity=".5"/>
+    <stop offset="1" stop-color="#1D2620" stop-opacity="0"/>
+  </linearGradient></defs>
+  <rect width="1200" height="1500" fill="#2C3A2E"/>
+  <rect x="70" y="70" width="1060" height="880" rx="28" fill="#E8EFD8"/>
+  <clipPath id="wvilla"><rect x="70" y="70" width="1060" height="880" rx="28"/></clipPath>
+  <g clip-path="url(#wvilla)">
+    <circle cx="260" cy="280" r="84" fill="#C9A45C"/>
+    <path d="M0 680 Q 500 480 1200 800 L1200 950 L0 950 Z" fill="#4F5F3A"/><path d="M0 810 Q 780 660 1200 880 L1200 950 L0 950 Z" fill="#5A6B43"/><path d="M0 890 Q 300 760 1200 900 L1200 950 L0 950 Z" fill="#2C3A2E"/>
+    <path d="M220 685 L279.8 800 L160.2 800 Z" fill="#1D2620"/><path d="M320 685 L379.8 800 L260.2 800 Z" fill="#1D2620"/><path d="M420 685 L479.8 800 L360.2 800 Z" fill="#1D2620"/><path d="M830 685 L889.8 800 L770.2 800 Z" fill="#1D2620"/><path d="M930 685 L989.8 800 L870.2 800 Z" fill="#1D2620"/><path d="M1020 685 L1079.8 800 L960.2 800 Z" fill="#1D2620"/>
+    <rect x="70" y="70" width="1060" height="360" fill="url(#scrimvilla)"/>
+  </g>
+  <rect x="592.0" y="70" width="16" height="880" fill="#1D2620"/>
+  <rect x="70" y="70" width="1060" height="880" rx="28" fill="none" stroke="#1D2620" stroke-width="14"/>
+  <rect x="0" y="1010" width="1200" height="10" fill="#4F5F3A" opacity=".65"/>
+  <path d="M180 1300 q-70 -130 0 -200 q70 70 0 200z" fill="#4F5F3A"/><rect x="150" y="1300" width="60" height="70" rx="12" fill="#5A6B43"/><circle cx="1040" cy="1120" r="44" fill="#C9A45C" opacity=".85"/><rect x="1032" y="1160" width="16" height="150" fill="#4F5F3A"/>
+</svg>

@@ -1,0 +1,11 @@
+# Thay https://ten-mien-cua-ban.vn bằng tên miền thật khi triển khai
+User-agent: *
+Allow: /
+Disallow: /management.html
+Disallow: /kham-pha.html
+Disallow: /api/
+Disallow: /docs
+Disallow: /redoc
+Disallow: /openapi.json
+
+Sitemap: https://ten-mien-cua-ban.vn/sitemap.xml

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2C3A2E">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Bản đồ và cẩm nang điểm đến Đà Lạt cho khách Grandview Hotel. Bản thử nghiệm.">
+  <title>Khám phá Đà Lạt | Grandview Hotel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Great+Vibes&family=Newsreader:opsz,wght@6..72,400..500&display=swap" rel="stylesheet">
+  <link rel="icon" href="grandview-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Trang khám phá: cùng ngôn ngữ thiết kế với trang chủ, thêm bản đồ sơ đồ hóa. */
+    .ex-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.1rem 0; }
+    .ex-head-right { display: flex; align-items: center; gap: .6rem; }
+    .beta-tag {
+      display: inline-flex; align-items: center; min-height: 24px; padding: .1rem .6rem;
+      border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+      font-size: .7rem; font-weight: 600; color: var(--stone); letter-spacing: .02em;
+    }
+    .lang-switch { display: inline-flex; border: 1px solid var(--cloud); border-radius: var(--radius-pill); overflow: hidden; }
+    .lang-switch button {
+      min-height: 38px; padding: .4rem .9rem; border: 0; background: transparent;
+      font-size: .82rem; font-weight: 500; color: var(--stone);
+    }
+    .lang-switch button[aria-pressed="true"] { background: var(--pine); color: var(--white); }
+
+    .ex-title { max-width: 60ch; margin-bottom: 1.25rem; }
+    .ex-title h1 { font-size: clamp(2rem, 1.3rem + 2.6vw, 3rem); font-weight: 300; line-height: 1.12; letter-spacing: -.02em; color: var(--moss); }
+    .ex-title p { margin-top: .6rem; color: var(--stone); font-size: .92rem; }
+
+    .ex-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin-bottom: 1.25rem; }
+    .view-switch { display: inline-flex; gap: .4rem; }
+    .view-switch button {
+      min-height: 40px; padding: .45rem 1.1rem;
+      border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+      background: transparent; font-size: .85rem; font-weight: 500;
+    }
+    .view-switch button[aria-pressed="true"] { background: var(--pine); border-color: var(--pine); color: var(--white); }
+    .cat-filter { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .cat-filter button {
+      min-height: 36px; padding: .3rem .85rem;
+      border: 1px solid var(--line); border-radius: var(--radius-pill);
+      background: var(--paper); font-size: .8rem; color: var(--pine-soft);
+    }
+    .cat-filter button[aria-pressed="true"] { background: var(--jade-light); border-color: var(--jade-light); color: var(--pine); font-weight: 500; }
+
+    .ex-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+
+    /* Bản đồ */
+    .map-frame {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--mist);
+    }
+    .map-frame > svg { display: block; width: 100%; height: auto; }
+    .pin {
+      position: absolute; z-index: 2; transform: translate(-50%, -100%);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 0; border: 0; background: none; color: var(--pine);
+    }
+    .pin-dot {
+      display: grid; place-items: center; width: 26px; height: 26px;
+      border: 2px solid var(--paper); border-radius: 50% 50% 50% 4px;
+      transform: rotate(45deg); background: var(--jade);
+      box-shadow: 0 2px 6px rgba(18, 26, 20, .35);
+    }
+    .pin-dot span { transform: rotate(-45deg); font-size: .7rem; font-weight: 600; color: var(--white); }
+    .pin-label {
+      position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+      max-width: 16ch; padding: .1rem .45rem; border-radius: 6px;
+      background: var(--pine); color: var(--white);
+      font-size: .7rem; line-height: 1.25; text-align: center; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity .12s;
+    }
+    .pin:hover .pin-label, .pin:focus-visible .pin-label,
+    .pin[aria-pressed="true"] .pin-label, .pin-hotel .pin-label { opacity: 1; }
+    .pin:hover, .pin:focus-visible, .pin[aria-pressed="true"] { z-index: 3; }
+    .pin[aria-pressed="true"] .pin-dot { background: var(--honey); transform: rotate(45deg) scale(1.18); }
+    .pin-hotel .pin-dot { background: var(--pine); border-radius: 50%; transform: none; }
+    .pin-hotel .pin-dot span { transform: none; }
+    .map-note { margin-top: .5rem; font-size: .76rem; color: var(--stone); }
+    .map-legend { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
+    .map-legend button {
+      display: inline-flex; align-items: center; gap: .4rem;
+      min-height: 32px; padding: .2rem .7rem .2rem .3rem;
+      border: 1px solid var(--line); border-radius: var(--radius-pill);
+      background: var(--paper); font-size: .78rem; color: var(--pine-soft);
+    }
+    .map-legend b {
+      display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--jade); color: var(--white); font-size: .68rem; font-weight: 600;
+    }
+    .map-legend button[aria-pressed="true"] { border-color: var(--jade); background: var(--jade-tint); }
+    .map-legend button[aria-pressed="true"] b { background: var(--honey); }
+
+    /* Danh sách */
+    .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .9rem; }
+    .place-card {
+      display: flex; flex-direction: column; gap: .3rem; padding: 1rem; text-align: left;
+      border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--paper);
+    }
+    .place-card:hover { border-color: var(--jade); }
+    .place-card[aria-pressed="true"] { border-color: var(--jade); box-shadow: 0 0 0 2px var(--jade-tint); }
+    .place-card h3 { font-size: 1rem; font-weight: 500; }
+    .place-card p { font-size: .82rem; color: var(--stone); }
+    .place-meta { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+    .tag {
+      padding: .12rem .55rem; border: 1px solid var(--line); border-radius: var(--radius-pill);
+      font-size: .7rem; color: var(--pine-soft);
+    }
+
+    /* Chi tiết */
+    .detail {
+      position: sticky; top: 1rem;
+      padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--paper);
+    }
+    .detail h2 { font-size: 1.4rem; font-weight: 300; color: var(--moss); }
+    .detail > p { margin-top: .5rem; font-size: .9rem; }
+    .detail dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .3rem .9rem; margin: 1rem 0; font-size: .86rem; }
+    .detail dt { color: var(--stone); }
+    .detail dd { margin: 0; }
+    .detail-tip { padding: .7rem .9rem; border-radius: 12px; background: var(--jade-tint); font-size: .84rem; }
+    .detail-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+    .detail-empty { color: var(--stone); font-size: .88rem; }
+
+    /* Lịch trình */
+    .plan { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
+    .plan h2 { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem); font-weight: 300; color: var(--moss); }
+    .plan-tabs { display: flex; gap: .5rem; margin: 1rem 0 1.25rem; flex-wrap: wrap; }
+    .plan-tabs button {
+      min-height: 40px; padding: .45rem 1.1rem;
+      border: 1px solid var(--cloud); border-radius: var(--radius-pill); background: transparent; font-size: .85rem;
+    }
+    .plan-tabs button[aria-selected="true"] { background: var(--jade); border-color: var(--jade); color: var(--white); }
+    .plan-day { max-width: 70ch; }
+    .plan-day > p { color: var(--stone); font-size: .9rem; margin-bottom: 1rem; }
+    .plan-stop { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: .5rem 1rem; padding: .85rem 0; border-top: 1px solid var(--line); }
+    .plan-time { font-size: .82rem; color: var(--stone); font-variant-numeric: tabular-nums; }
+    .plan-stop strong { font-weight: 500; }
+    .plan-stop p { font-size: .85rem; color: var(--stone); margin-top: .15rem; }
+    .plan-stop button {
+      margin-top: .35rem; padding: 0; border: 0; background: none;
+      font-size: .8rem; color: var(--jade); text-decoration: underline; text-underline-offset: 3px;
+    }
+
+
+    /* ===== Đầu trang: tiêu đề + thời tiết ===== */
+    .ex-hero { display: grid; gap: 1.25rem; margin-bottom: 1.5rem; }
+    .ex-hero .ex-title { margin-bottom: 0; }
+    .ex-eyebrow { margin-bottom: .5rem; font-size: .7rem; font-weight: 600; letter-spacing: .14em; color: var(--jade); }
+
+    /* ===== Thời tiết (chuyển từ index.CNfa0ei_.css, đổi sang biến màu Grandview) ===== */
+    .mountain-weather { isolation: isolate; position: relative; overflow: hidden; min-width: 0; padding: 20px 20px 14px; border: 1px solid #d5ddce; border-radius: var(--radius-m); background: #f1f3e9; color: var(--pine); box-shadow: 0 5px 16px rgba(22, 62, 48, .035); }
+    .mountain-weather .weather-ambient { position: absolute; left: 0; right: 0; bottom: 0; z-index: -2; width: 100%; height: 38%; opacity: .55; pointer-events: none; }
+    .mountain-weather::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgba(241, 243, 233, .85) 0%, rgba(241, 243, 233, .46) 43%, rgba(241, 243, 233, .7) 70%, rgba(241, 243, 233, .95) 100%); }
+    .weather-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .weather-eyebrow { margin-bottom: 6px; font-size: 9px; letter-spacing: 1.6px; color: #61745d; }
+    .weather-heading h2 { margin: 0; font-size: 27px; font-weight: 300; letter-spacing: -.6px; color: var(--moss); }
+    .weather-heading select { width: 150px; min-height: 44px; padding: 8px; border: 1px solid #ccd6c5; border-radius: var(--radius-s); background: #fafbf5; font: inherit; font-size: 13px; color: var(--pine); }
+    .weather-meta { display: flex; justify-content: space-between; gap: 8px; margin: 17px 0 4px; font-size: 10px; color: #61745d; }
+    .weather-snapshot-label { margin: 0 0 8px; font-size: 10px; color: #4b6050; }
+    .weather-content { min-height: 164px; }
+    .weather-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+    .weather-day { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 10px 1px 8px; border-radius: 6px; text-align: center; font-variant-numeric: tabular-nums; }
+    .weather-today { background: #e1e9d8; }
+    .weather-day time { display: flex; flex-direction: column; gap: 4px; font-size: 10px; white-space: nowrap; }
+    .weather-day time strong { font-weight: 600; }
+    .weather-day time span { font-size: 9px; color: #61745d; }
+    .weather-icon { display: block; width: 26px; height: 30px; margin: 9px 0 5px; color: #697d6c; }
+    .weather-icon svg, .weather-condition svg, .weather-notice-icon svg { width: 100%; height: 100%; }
+    .weather-sun { color: #a77b30; }
+    .weather-rain, .weather-storm { color: #416d7c; }
+    .weather-high { font-size: 18px; font-weight: 600; }
+    .weather-low { margin-top: 3px; font-size: 12px; color: #61745d; }
+    .weather-day .weather-pop { margin-top: 12px; font-size: 11px; font-weight: 600; color: #416d7c; }
+    .weather-status { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 164px; text-align: center; font-size: 13px; color: #61745d; }
+    .weather-status button { min-height: 44px; padding: 8px 14px; border: 1px solid #b7c7ae; border-radius: 5px; background: #fafbf5; color: var(--pine); }
+    .mountain-weather .weather-stale { max-width: none; margin: 10px 0 0; padding: 8px 10px; border: 1px solid #cbbd8b; border-radius: 5px; background: #fff8e9; font-size: 11px; line-height: 1.5; color: #72551d; }
+    .weather-notices { margin-top: 12px; padding: 12px; border: 1px solid #c6d2c0; border-radius: 7px; background: rgba(251, 252, 244, .91); }
+    .weather-notices-heading { margin-bottom: 9px; font-size: 10px; color: #52654e; }
+    .weather-condition { display: flex; align-items: center; gap: 8px; margin: 4px 0 12px; font-size: 16px; }
+    .weather-condition > span { display: block; width: 26px; height: 26px; }
+    .weather-condition strong { font-weight: 600; }
+    .weather-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #d9dfd2; }
+    .weather-metrics > div { min-width: 0; }
+    .weather-metrics > div > span, .weather-metrics small { display: block; font-size: 10px; line-height: 1.5; color: #52654e; }
+    .weather-metrics strong { display: block; margin: 3px 0; font-size: 15px; font-weight: 600; }
+    .weather-gust { display: block; }
+    .weather-notice { display: flex; align-items: flex-start; gap: 9px; color: #466476; }
+    .weather-notice + .weather-notice { margin-top: 10px; padding-top: 10px; border-top: 1px solid #d9dfd2; }
+    .weather-notice-icon { flex: 0 0 23px; width: 23px; height: 25px; margin-top: 1px; }
+    .mountain-weather .weather-notice p { max-width: none; margin: 0 0 3px; font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--pine); }
+    .weather-notice small { display: block; font-size: 10px; line-height: 1.5; color: #52654e; }
+    .weather-notice-storm { color: #975533; }
+    .weather-notice-sun { color: #a77b30; }
+    .weather-notice-fog { color: #687665; }
+    .weather-notice-wind { color: #85603a; }
+    .weather-notice-cold { color: #3f5f86; }
+    .mountain-weather .weather-note { max-width: none; margin: 12px 0 7px; font-size: 11px; line-height: 1.5; color: #61745d; }
+    .weather-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #d5ddce; font-size: 9px; color: #61745d; }
+    .weather-footer a { text-decoration: underline; text-underline-offset: 2px; }
+    @media (min-width: 901px) {
+      .mountain-weather { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 1.5rem; align-items: start; }
+      .mountain-weather > .weather-ambient { grid-column: 1 / -1; }
+      .weather-col-main { grid-column: 1; }
+      .weather-col-side { grid-column: 2; }
+      .weather-col-side .weather-notices { margin-top: 0; }
+    }
+    .weather-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    /* ===== Dải liên hệ cuối trang ===== */
+    .connect-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin-top: 2.5rem; padding: 16px 0; border-top: 1px solid var(--line); font-size: 13px; }
+    .feedback-prompt { margin: 0; white-space: nowrap; color: var(--stone); }
+    .feedback-prompt a { margin-left: 7px; font-weight: 600; color: var(--pine); }
+    .strip-phone { white-space: nowrap; }
+    .strip-socials { display: flex; align-items: center; gap: 4px; }
+    .strip-socials a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; color: var(--pine); }
+    .strip-socials a:hover { background: var(--jade-tint); }
+    .strip-socials svg { width: 21px; height: 21px; }
+    .strip-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-left: auto; }
+    .strip-actions a { min-height: 44px; white-space: nowrap; }
+
+    .ex-foot-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; }
+    .ex-foot-links { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; }
+    .ex-foot-links a { color: var(--pine-soft); text-decoration: underline; text-underline-offset: 3px; }
+    .ex-foot-note { margin-top: .9rem; }
+
+    .ex-foot { margin-top: 1.5rem; padding: 1.25rem 0 2rem; border-top: 1px solid var(--line); font-size: .78rem; color: var(--stone); }
+
+    @media (max-width: 900px) {
+      .ex-layout { grid-template-columns: 1fr; }
+      .detail { position: static; }
+      .pin-label { display: none; }
+
+    }
+
+    @media (max-width: 720px) {
+      .connect-strip { gap: 10px 14px; font-size: 12px; }
+      .feedback-prompt, .strip-phone { width: 100%; }
+      .strip-actions { margin-left: 0; }
+    }
+    @media (max-width: 420px) {
+      .mountain-weather { padding: 16px 10px 12px; }
+      .weather-heading { gap: 6px; }
+      .weather-heading h2 { font-size: 24px; }
+      .weather-heading select { width: 124px; padding: 8px 4px; font-size: 16px; }
+      .weather-eyebrow { font-size: 8px; letter-spacing: 1.1px; }
+      .weather-day time { font-size: 9px; }
+      .weather-day time span { font-size: 8px; }
+      .weather-high { font-size: 17px; }
+      .weather-days { gap: 1px; }
+      .weather-meta, .weather-footer { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="ex-head">
+      <a class="brand" href="/" aria-label="Grandview Hotel, về trang chủ">
+        <span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="mark-arch" d="M8 60V30a24 24 0 0 1 48 0v30z"/><circle class="mark-sun" cx="41" cy="25" r="6"/><path class="mark-tree" d="M15 52l9-20 9 20z M27 52l8-15 8 15z M37 52l7-12 7 12z"/><rect class="mark-ground" x="12" y="52" width="40" height="2.5" rx="1.25"/></svg></span>
+        <span class="brand-words">
+          <span class="brand-mark">Grandview</span>
+          <span class="brand-sub">Khách sạn &amp; nghỉ dưỡng</span>
+        </span>
+      </a>
+      <div class="ex-head-right">
+        <span class="beta-tag" id="betaTag">Bản thử nghiệm</span>
+        <div class="lang-switch" role="group" aria-label="Ngôn ngữ" id="langSwitch">
+          <button type="button" data-lang="vi" aria-pressed="true">VI</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="ex-hero">
+        <div class="ex-title">
+          <div class="ex-eyebrow" id="pageEyebrow"></div>
+          <h1 id="pageTitle"></h1>
+          <p id="pageLead"></p>
+        </div>
+
+        <!-- Thời tiết 7 ngày. Dữ liệu lấy qua /api/weather (app/main.py), dự phòng gọi thẳng Open-Meteo. -->
+        <section class="mountain-weather" id="weather" aria-labelledby="weatherTitle">
+          <svg class="weather-ambient" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M0 100V62l38-14 46 18 58-30 64 26 56-20 66 24 72-22v56z" fill="#c9d3b6" opacity=".7"/>
+            <path d="M0 100V78l52-10 60 14 70-16 64 12 74-14 80 10v26z" fill="#b5c39d" opacity=".55"/>
+          </svg>
+          <div class="weather-col-main">
+          <div class="weather-heading">
+            <div>
+              <div class="weather-eyebrow" id="weatherEyebrow"></div>
+              <h2 id="weatherTitle"></h2>
+            </div>
+            <label>
+              <span class="weather-sr-only" id="weatherAreaLabel"></span>
+              <select id="weatherArea"></select>
+            </label>
+          </div>
+          <div class="weather-meta"><span id="weatherMeta"></span></div>
+          <div class="weather-snapshot-label" id="weatherSnapshot"></div>
+          <div class="weather-content" id="weatherContent" aria-busy="true"></div>
+          <p class="weather-stale" id="weatherStale" hidden></p>
+          <p class="weather-note" id="weatherNote"></p>
+          <div class="weather-footer">
+            <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" id="weatherSource"></a>
+            <time id="weatherUpdated"></time>
+          </div>
+          <noscript><p class="weather-note">Bật JavaScript để xem dự báo thời tiết.</p></noscript>
+          </div>
+          <div class="weather-col-side">
+            <aside class="weather-notices" id="weatherNotices" aria-live="polite" aria-atomic="true" hidden></aside>
+          </div>
+        </section>
+      </div>
+
+      <div class="ex-bar">
+        <div class="view-switch" role="group" aria-label="Chế độ xem" id="viewSwitch">
+          <button type="button" data-view="map" aria-pressed="true"></button>
+          <button type="button" data-view="list" aria-pressed="false"></button>
+        </div>
+        <div class="cat-filter" role="group" aria-label="Nhóm điểm đến" id="catFilter"></div>
+      </div>
+
+      <div class="ex-layout">
+        <section id="mapView" aria-labelledby="pageTitle">
+          <div class="map-frame" id="mapFrame">
+            <svg viewBox="0 0 700 1200" role="img" aria-labelledby="mapTitleText">
+              <title id="mapTitleText">Sơ đồ vị trí các điểm đến quanh Đà Lạt</title>
+              <rect width="700" height="1200" fill="#F5F2EA"/>
+              <!-- vùng rừng thông -->
+              <g fill="#D3DCB4" opacity=".55">
+                <path d="M60 200l14-30 14 30z M100 250l12-26 12 26z M48 320l13-28 13 28z M150 150l12-26 12 26z"/>
+                <path d="M600 260l14-30 14 30z M560 330l12-26 12 26z M640 420l13-28 13 28z M520 200l12-26 12 26z"/>
+                <path d="M90 900l14-30 14 30z M150 980l12-26 12 26z M60 1050l13-28 13 28z M200 1100l12-26 12 26z"/>
+                <path d="M590 980l14-30 14 30z M640 1080l12-26 12 26z M540 1120l13-28 13 28z"/>
+                <path d="M430 1060l14-30 14 30z M470 1140l12-26 12 26z"/>
+              </g>
+              <!-- vùng đô thị -->
+              <ellipse cx="330" cy="700" rx="190" ry="150" fill="#E7EAD9"/>
+              <ellipse cx="330" cy="700" rx="190" ry="150" fill="none" stroke="#DAD5C6" stroke-width="2" stroke-dasharray="8 8"/>
+              <!-- đường chính -->
+              <g stroke="#DAD5C6" stroke-width="7" fill="none" stroke-linecap="round">
+                <path d="M318 718 C 300 560, 330 320, 352 86"/>
+                <path d="M318 718 C 300 820, 270 960, 251 1032"/>
+                <path d="M318 718 C 420 740, 520 760, 606 770"/>
+                <path d="M318 718 C 360 800, 420 880, 470 1000"/>
+              </g>
+              <!-- hồ Xuân Hương -->
+              <path d="M268 700 q50 -44 104 -16 q34 18 16 44 q-20 28 -62 20 q-44 -8 -58 -48z" fill="#CFE0E4" stroke="#8FA9AE" stroke-width="2"/>
+              <!-- hồ Tuyền Lâm -->
+              <path d="M196 1012 q58 -40 104 -4 q36 28 4 58 q-44 40 -94 6 q-34 -24 -14 -60z" fill="#CFE0E4" stroke="#8FA9AE" stroke-width="2"/>
+              <!-- đỉnh Langbiang -->
+              <path d="M300 120 l52 -72 l52 72z" fill="#4F5F3A" opacity=".5"/>
+              <text x="36" y="1168" font-family="'Be Vietnam Pro',system-ui,sans-serif" font-size="20" fill="#6E6B5E">Đà Lạt</text>
+              <text x="664" y="1168" text-anchor="end" font-family="'Be Vietnam Pro',system-ui,sans-serif" font-size="18" fill="#6E6B5E">Bắc ↑</text>
+            </svg>
+          </div>
+          <p class="map-note" id="mapNote"></p>
+          <div class="map-legend" id="mapLegend"></div>
+        </section>
+
+        <section id="listView" hidden aria-labelledby="pageTitle">
+          <div class="place-grid" id="placeGrid"></div>
+        </section>
+
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <section class="plan" aria-labelledby="planTitle">
+        <h2 id="planTitle"></h2>
+        <div class="plan-tabs" role="tablist" aria-label="Lịch trình theo ngày" id="planTabs"></div>
+        <div class="plan-day" id="planDay"></div>
+      </section>
+
+      <!-- Góp ý, liên hệ và lối tắt quay lại các dịch vụ của khách sạn -->
+      <section class="connect-strip" id="connectStrip" aria-label="Góp ý và liên hệ"></section>
+    </main>
+
+    <footer class="ex-foot" id="exFoot"></footer>
+  </div>
+
+  <script>
+  (() => {
+    // Khung tọa độ của sơ đồ. Vị trí trên sơ đồ là tương đối, không dùng để dẫn đường.
+    const BOUNDS = { latMin: 11.86, latMax: 12.06, lngMin: 108.385, lngMax: 108.505 };
+
+    const CATEGORIES = [
+      { id: "all", vi: "Tất cả", en: "All" },
+      { id: "nature", vi: "Thiên nhiên", en: "Nature" },
+      { id: "heritage", vi: "Di tích và tâm linh", en: "Heritage" },
+      { id: "city", vi: "Trung tâm và chợ", en: "In town" },
+      { id: "farm", vi: "Nông trại và đồi chè", en: "Farms" },
+    ];
+
+    const HOTEL = { lat: 11.9220, lng: 108.4330 };
+
+    const PLACES = [
+      {
+        id: "ho-xuan-huong", cat: "nature", lat: 11.9404, lng: 108.4396, km: 2,
+        name: { vi: "Hồ Xuân Hương", en: "Xuan Huong Lake" },
+        desc: {
+          vi: "Hồ nhân tạo hình trăng lưỡi liềm ngay giữa thành phố, chu vi khoảng 5 km, viền quanh là thông và vườn hoa. Đi bộ hoặc đạp xe một vòng là cách dễ nhất để làm quen với Đà Lạt.",
+          en: "A crescent-shaped lake in the middle of town, about 5 km around, edged with pines and flower beds. Walking or cycling the loop is the easiest way to get your bearings.",
+        },
+        time: { vi: "1 đến 2 giờ", en: "1 to 2 hours" },
+        best: { vi: "Sáng sớm khi còn sương", en: "Early morning, in the mist" },
+        fee: { vi: "Miễn phí", en: "Free" },
+        tip: { vi: "Cà phê bờ hồ đông nhất lúc 7 giờ sáng. Đi vòng ngược chiều kim đồng hồ để mặt trời ở sau lưng.", en: "Lakeside cafes fill up at 7am. Walk anticlockwise to keep the sun behind you." },
+      },
+      {
+        id: "quang-truong-lam-vien", cat: "city", lat: 11.9388, lng: 108.4445, km: 2.5,
+        name: { vi: "Quảng trường Lâm Viên", en: "Lam Vien Square" },
+        desc: {
+          vi: "Quảng trường trung tâm bên hồ với hai khối kính hình nụ hoa dã quỳ và atiso. Buổi tối có nhạc nước và nhiều gia đình ra chơi.",
+          en: "The waterfront main square, with two glass buildings shaped like a sunflower bud and an artichoke. Evenings bring fountains and families.",
+        },
+        time: { vi: "45 phút", en: "45 minutes" },
+        best: { vi: "Sau 19:00", en: "After 7pm" },
+        fee: { vi: "Miễn phí", en: "Free" },
+        tip: { vi: "Khối hoa dã quỳ sáng đèn sau khi trời tối hẳn, khoảng 19:30.", en: "The sunflower bud lights up once it is fully dark, around 7:30pm." },
+      },
+      {
+        id: "cho-da-lat", cat: "city", lat: 11.9422, lng: 108.4370, km: 2.5,
+        name: { vi: "Chợ Đà Lạt và chợ đêm", en: "Da Lat Market and night market" },
+        desc: {
+          vi: "Chợ ba tầng bán rau, hoa, mứt và đặc sản. Từ chiều muộn, con dốc trước chợ thành chợ đêm với bánh tráng nướng, sữa đậu nành nóng và đồ len.",
+          en: "A three-floor market of vegetables, flowers, candied fruit and local produce. From late afternoon the slope in front turns into a night market of grilled rice paper, hot soy milk and knitwear.",
+        },
+        time: { vi: "1 đến 2 giờ", en: "1 to 2 hours" },
+        best: { vi: "17:00 đến 22:00", en: "5pm to 10pm" },
+        fee: { vi: "Miễn phí vào", en: "Free entry" },
+        tip: { vi: "Mua mứt và trà ở tầng trệt phía sau, giá dễ chịu hơn mặt tiền.", en: "Buy candied fruit and tea at the back of the ground floor, cheaper than the front stalls." },
+      },
+      {
+        id: "nha-tho-con-ga", cat: "heritage", lat: 11.9398, lng: 108.4418, km: 2.4,
+        name: { vi: "Nhà thờ Con Gà", en: "Da Lat Cathedral" },
+        desc: {
+          vi: "Nhà thờ chính tòa xây từ năm 1931, tháp chuông cao 47 m có con gà bằng hợp kim trên đỉnh. Kính màu trong lòng nhà thờ do xưởng ở Pháp chế tác.",
+          en: "The cathedral begun in 1931, with a 47 m bell tower topped by a metal rooster. The stained glass inside was made in France.",
+        },
+        time: { vi: "30 phút", en: "30 minutes" },
+        best: { vi: "Ngoài giờ lễ", en: "Outside mass times" },
+        fee: { vi: "Miễn phí", en: "Free" },
+        tip: { vi: "Mặc áo kín vai khi vào trong. Giờ lễ sáng và chiều không nên tham quan.", en: "Cover your shoulders inside. Avoid visiting during morning and evening mass." },
+      },
+      {
+        id: "ga-da-lat", cat: "heritage", lat: 11.9429, lng: 108.4536, km: 3.5,
+        name: { vi: "Ga Đà Lạt", en: "Da Lat Railway Station" },
+        desc: {
+          vi: "Nhà ga xây năm 1932 với ba mái nhọn lấy theo dáng núi Langbiang, được xếp hạng di tích quốc gia. Còn một đoạn tàu chạy 7 km tới Trại Mát.",
+          en: "Built in 1932, its three pointed roofs echo Langbiang mountain. It is a national heritage site and still runs a 7 km tourist train to Trai Mat.",
+        },
+        time: { vi: "1 giờ, hoặc 2 giờ nếu đi tàu", en: "1 hour, or 2 with the train ride" },
+        best: { vi: "Chuyến tàu sáng", en: "Morning train" },
+        fee: { vi: "Vé vào ga và vé tàu riêng", en: "Separate station and train tickets" },
+        tip: { vi: "Tàu đi Trại Mát dừng gần chùa Linh Phước, ghép hai điểm này trong một buổi sáng.", en: "The train to Trai Mat stops near Linh Phuoc Pagoda, so pair them in one morning." },
+      },
+      {
+        id: "vuon-hoa-thanh-pho", cat: "nature", lat: 11.9480, lng: 108.4440, km: 3.5,
+        name: { vi: "Vườn hoa thành phố", en: "Da Lat Flower Gardens" },
+        desc: {
+          vi: "Vườn hoa bên bờ bắc hồ Xuân Hương, trồng theo mùa với cẩm tú cầu, hồng, phong lữ và nhà kính lan.",
+          en: "Seasonal gardens on the north shore of Xuan Huong Lake: hydrangeas, roses, geraniums and an orchid greenhouse.",
+        },
+        time: { vi: "1 giờ", en: "1 hour" },
+        best: { vi: "Tháng 12 đến tháng 3", en: "December to March" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Cẩm tú cầu nở rộ khoảng tháng 5 và tháng 6, không phải mùa hoa cuối năm.", en: "Hydrangeas peak in May and June, not during the year-end flower season." },
+      },
+      {
+        id: "dinh-bao-dai", cat: "heritage", lat: 11.9330, lng: 108.4255, km: 2.8,
+        name: { vi: "Dinh Bảo Đại", en: "Bao Dai Summer Palace" },
+        desc: {
+          vi: "Dinh III, nơi nghỉ của vị vua cuối cùng, xây những năm 1930 giữa rừng thông. Nội thất, phòng làm việc và phòng ngủ gần như giữ nguyên.",
+          en: "Palace III, the last emperor's residence, built in the 1930s among the pines. The study and bedrooms are largely as they were.",
+        },
+        time: { vi: "1 giờ", en: "1 hour" },
+        best: { vi: "Buổi chiều ít khách hơn", en: "Quieter in the afternoon" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Khách phải bọc giày trước khi vào nhà, có phát ở cửa.", en: "Shoe covers are required inside and handed out at the door." },
+      },
+      {
+        id: "crazy-house", cat: "heritage", lat: 11.9340, lng: 108.4310, km: 2.4,
+        name: { vi: "Biệt thự Hằng Nga", en: "Hang Nga Guesthouse" },
+        desc: {
+          vi: "Công trình do kiến trúc sư Đặng Việt Nga thiết kế, các khối nhà uốn như thân cây và hang đá, nối nhau bằng cầu thang hẹp ngoài trời.",
+          en: "Designed by architect Dang Viet Nga, its buildings curve like tree trunks and caves, linked by narrow open-air stairways.",
+        },
+        time: { vi: "45 phút", en: "45 minutes" },
+        best: { vi: "Sáng sớm, trước khi đông", en: "Early morning, before the crowds" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Cầu thang hẹp và không có lan can ở vài đoạn, cân nhắc nếu đi cùng trẻ nhỏ hoặc người sợ độ cao.", en: "Some stairways are narrow and unrailed; think twice with small children or a fear of heights." },
+      },
+      {
+        id: "thien-vien-truc-lam", cat: "heritage", lat: 11.8975, lng: 108.4240, km: 6,
+        name: { vi: "Thiền viện Trúc Lâm", en: "Truc Lam Zen Monastery" },
+        desc: {
+          vi: "Thiền viện lớn nhất Lâm Đồng, nằm trên núi Phụng Hoàng, nhìn xuống hồ Tuyền Lâm. Khuôn viên có vườn hoa và rừng thông bao quanh.",
+          en: "The largest Zen monastery in the province, on Phung Hoang hill looking down over Tuyen Lam Lake, with flower gardens and pine forest around it.",
+        },
+        time: { vi: "1 đến 2 giờ", en: "1 to 2 hours" },
+        best: { vi: "Sáng, khi mặt hồ còn sương", en: "Morning, while mist sits on the lake" },
+        fee: { vi: "Miễn phí, cáp treo tính vé riêng", en: "Free; the cable car is ticketed" },
+        tip: { vi: "Đi cáp treo từ đồi Robin để có đoạn bay trên rừng thông, rồi xuống hồ Tuyền Lâm bằng bậc thang.", en: "Ride the cable car from Robin Hill over the pine forest, then take the steps down to the lake." },
+      },
+      {
+        id: "ho-tuyen-lam", cat: "nature", lat: 11.8880, lng: 108.4280, km: 7,
+        name: { vi: "Hồ Tuyền Lâm", en: "Tuyen Lam Lake" },
+        desc: {
+          vi: "Hồ rộng nhất Đà Lạt, nhiều nhánh ăn sâu vào rừng thông. Có thuyền, đạp vịt và đường mòn đi bộ dọc bờ.",
+          en: "The largest lake around Da Lat, its arms reaching into pine forest. Boats, pedalos and shoreline trails.",
+        },
+        time: { vi: "2 giờ", en: "2 hours" },
+        best: { vi: "Chiều muộn", en: "Late afternoon" },
+        fee: { vi: "Miễn phí, thuyền tính riêng", en: "Free; boats extra" },
+        tip: { vi: "Bến thuyền phía chân Thiền viện vắng hơn bến chính.", en: "The jetty below the monastery is quieter than the main one." },
+      },
+      {
+        id: "thac-datanla", cat: "nature", lat: 11.9010, lng: 108.4470, km: 6.5,
+        name: { vi: "Thác Datanla", en: "Datanla Falls" },
+        desc: {
+          vi: "Thác nhiều tầng trong thung lũng hẹp, xuống bằng bậc thang hoặc máng trượt. Nước mạnh nhất vào mùa mưa.",
+          en: "A multi-tier waterfall in a narrow valley, reached by steps or an alpine coaster. Fullest in the rainy season.",
+        },
+        time: { vi: "2 giờ", en: "2 hours" },
+        best: { vi: "Tháng 6 đến tháng 10", en: "June to October" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Đi giày bám tốt, bậc đá trơn khi ẩm.", en: "Wear shoes with grip; the stone steps are slick when damp." },
+      },
+      {
+        id: "langbiang", cat: "nature", lat: 12.0470, lng: 108.4420, km: 12,
+        name: { vi: "Núi Langbiang", en: "Langbiang Mountain" },
+        desc: {
+          vi: "Hai đỉnh núi phía bắc thành phố, gắn với truyền thuyết chàng Lang và nàng Biang. Lên đỉnh Radar bằng xe jeep hoặc đi bộ đường mòn.",
+          en: "Twin peaks north of town, tied to the legend of Lang and Biang. Reach Radar Peak by jeep or on the walking trail.",
+        },
+        time: { vi: "Nửa ngày", en: "Half a day" },
+        best: { vi: "Trước 9 giờ để săn mây", en: "Before 9am for the cloud sea" },
+        fee: { vi: "Vé cổng và vé xe jeep", en: "Gate ticket plus jeep fare" },
+        tip: { vi: "Mây thường tan sau 9 giờ. Mang áo ấm, trên đỉnh lạnh hơn thành phố vài độ.", en: "Clouds usually clear after 9am. Bring a jacket; the summit runs a few degrees colder." },
+      },
+      {
+        id: "thung-lung-tinh-yeu", cat: "nature", lat: 11.9680, lng: 108.4480, km: 5,
+        name: { vi: "Thung lũng Tình Yêu", en: "Valley of Love" },
+        desc: {
+          vi: "Thung lũng đồi thông quanh hồ Đa Thiện, có vườn hoa, cầu kính và xe điện chạy vòng.",
+          en: "A pine-hill valley around Da Thien Lake, with flower gardens, a glass bridge and a shuttle loop.",
+        },
+        time: { vi: "2 giờ", en: "2 hours" },
+        best: { vi: "Giữa buổi sáng", en: "Mid-morning" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Khu vườn hoa nằm sâu bên trong, đi xe điện nếu ngại dốc.", en: "The flower garden sits deep inside; take the shuttle if you would rather skip the slopes." },
+      },
+      {
+        id: "ho-than-tho", cat: "nature", lat: 11.9690, lng: 108.4690, km: 6,
+        name: { vi: "Hồ Than Thở", en: "Than Tho Lake" },
+        desc: {
+          vi: "Hồ nhỏ giữa rừng thông và đồi cỏ hồng, yên tĩnh hơn các điểm trung tâm.",
+          en: "A small lake among pines and pink grass hills, quieter than the central sights.",
+        },
+        time: { vi: "1 giờ", en: "1 hour" },
+        best: { vi: "Tháng 11, mùa cỏ hồng", en: "November, pink grass season" },
+        fee: { vi: "Có bán vé", en: "Ticketed" },
+        tip: { vi: "Đồi cỏ hồng đẹp nhất lúc nắng xiên, khoảng 6 đến 7 giờ sáng.", en: "The pink grass looks best in low sun, roughly 6 to 7am." },
+      },
+      {
+        id: "chua-linh-phuoc", cat: "heritage", lat: 11.9430, lng: 108.4890, km: 8,
+        name: { vi: "Chùa Linh Phước", en: "Linh Phuoc Pagoda" },
+        desc: {
+          vi: "Còn gọi là chùa Ve Chai, toàn bộ công trình khảm bằng mảnh sành sứ. Có tháp chuông bảy tầng và vườn tượng phía sau.",
+          en: "Known as the Porcelain Pagoda, every surface is mosaicked with ceramic shards. A seven-storey bell tower and statue garden sit behind.",
+        },
+        time: { vi: "1 giờ", en: "1 hour" },
+        best: { vi: "Kết hợp với chuyến tàu Trại Mát", en: "Pair with the Trai Mat train" },
+        fee: { vi: "Miễn phí", en: "Free" },
+        tip: { vi: "Ga Trại Mát cách chùa khoảng 500 m đi bộ.", en: "Trai Mat station is about a 500 m walk from the pagoda." },
+      },
+      {
+        id: "doi-che-cau-dat", cat: "farm", lat: 11.7740, lng: 108.5560, km: 25, offMap: true,
+        name: { vi: "Đồi chè Cầu Đất", en: "Cau Dat Tea Hills" },
+        desc: {
+          vi: "Đồi chè trồng từ thời Pháp ở độ cao hơn 1.600 m, kèm nhà máy chè cũ. Buổi sớm thường có biển mây phủ thung lũng.",
+          en: "Tea hills planted in the French era above 1,600 m, with an old tea factory. Early mornings often bring a sea of cloud over the valley.",
+        },
+        time: { vi: "Nửa ngày, kể cả đường đi", en: "Half a day including travel" },
+        best: { vi: "5 đến 7 giờ sáng", en: "5 to 7am" },
+        fee: { vi: "Có bán vé ở một số khu", en: "Some areas ticketed" },
+        tip: { vi: "Cách trung tâm khoảng 25 km, nên đặt xe từ tối hôm trước để đi sớm.", en: "About 25 km from the centre; book a car the night before for an early start." },
+      },
+      {
+        id: "trang-trai-rau-hoa", cat: "farm", lat: 11.9560, lng: 108.4180, km: 4,
+        name: { vi: "Làng hoa Vạn Thành", en: "Van Thanh Flower Village" },
+        desc: {
+          vi: "Làng trồng hoa hồng lâu đời ở phía tây thành phố, hai bên đường là nhà kính và vườn cắt hoa.",
+          en: "A long-established rose-growing village west of town, lined with greenhouses and cutting gardens.",
+        },
+        time: { vi: "1 giờ", en: "1 hour" },
+        best: { vi: "Sáng, lúc nhà vườn cắt hoa", en: "Morning, when growers cut flowers" },
+        fee: { vi: "Miễn phí", en: "Free" },
+        tip: { vi: "Hỏi trước khi vào nhà kính, đây là vườn đang canh tác.", en: "Ask before entering a greenhouse; these are working farms." },
+      },
+    ];
+
+    const ITINERARY = [
+      {
+        day: { vi: "Ngày 1", en: "Day 1" },
+        lead: { vi: "Làm quen với trung tâm, đi bộ nhiều, không cần xe cả ngày.", en: "Get to know the centre on foot; no car needed all day." },
+        stops: [
+          { time: { vi: "7:00", en: "7:00" }, place: "ho-xuan-huong", note: { vi: "Đi một vòng hồ rồi ăn sáng bờ hồ.", en: "Walk the loop, then breakfast by the water." } },
+          { time: { vi: "9:30", en: "9:30" }, place: "nha-tho-con-ga", note: { vi: "Ghé khi vừa tan lễ sáng.", en: "Arrive just after morning mass ends." } },
+          { time: { vi: "11:00", en: "11:00" }, place: "crazy-house", note: { vi: "Đi trước giờ trưa cho vắng.", en: "Go before noon while it is quiet." } },
+          { time: { vi: "14:00", en: "14:00" }, place: "dinh-bao-dai", note: { vi: "Cách Hằng Nga vài phút xe.", en: "A few minutes by car from Hang Nga." } },
+          { time: { vi: "17:30", en: "17:30" }, place: "cho-da-lat", note: { vi: "Ăn tối ở chợ đêm.", en: "Dinner at the night market." } },
+          { time: { vi: "20:00", en: "20:00" }, place: "quang-truong-lam-vien", note: { vi: "Đi bộ từ chợ xuống, khoảng 10 phút.", en: "A ten-minute walk down from the market." } },
+        ],
+      },
+      {
+        day: { vi: "Ngày 2", en: "Day 2" },
+        lead: { vi: "Hướng nam, rừng thông và mặt nước. Nên thuê xe nửa ngày.", en: "South: pine forest and water. A half-day car helps." },
+        stops: [
+          { time: { vi: "8:00", en: "8:00" }, place: "thien-vien-truc-lam", note: { vi: "Lên bằng cáp treo từ đồi Robin.", en: "Ride up by cable car from Robin Hill." } },
+          { time: { vi: "10:00", en: "10:00" }, place: "ho-tuyen-lam", note: { vi: "Xuống hồ bằng bậc thang sau thiền viện.", en: "Take the steps down behind the monastery." } },
+          { time: { vi: "13:30", en: "13:30" }, place: "thac-datanla", note: { vi: "Nghỉ trưa rồi mới xuống thác.", en: "Have lunch first, then head down to the falls." } },
+          { time: { vi: "16:30", en: "16:30" }, place: "lang-hoa", note: { vi: "Về thành phố, ghé làng hoa nếu còn sớm.", en: "Back in town, stop at the flower village if there is time." }, fallback: "trang-trai-rau-hoa" },
+        ],
+      },
+      {
+        day: { vi: "Ngày 3", en: "Day 3" },
+        lead: { vi: "Dậy sớm săn mây, chiều thong thả quanh thành phố.", en: "Early start for the cloud sea, then an easy afternoon." },
+        stops: [
+          { time: { vi: "5:00", en: "5:00" }, place: "langbiang", note: { vi: "Đi xe jeep lên đỉnh Radar trước khi mây tan.", en: "Jeep to Radar Peak before the clouds lift." } },
+          { time: { vi: "10:00", en: "10:00" }, place: "thung-lung-tinh-yeu", note: { vi: "Trên đường về thành phố.", en: "On the way back into town." } },
+          { time: { vi: "14:00", en: "14:00" }, place: "ga-da-lat", note: { vi: "Đi chuyến tàu chiều ra Trại Mát.", en: "Take the afternoon train to Trai Mat." } },
+          { time: { vi: "15:30", en: "15:30" }, place: "chua-linh-phuoc", note: { vi: "Đi bộ từ ga Trại Mát.", en: "Walk over from Trai Mat station." } },
+        ],
+      },
+    ];
+
+    const T = {
+      title: { vi: "Khám phá Đà Lạt", en: "Explore Da Lat" },
+      lead: {
+        vi: "Các điểm đến quanh khách sạn, kèm thời gian nên dành, giờ đẹp nhất và một mẹo nhỏ cho mỗi nơi. Đây là bản thử nghiệm, nội dung còn đang bổ sung.",
+        en: "Places around the hotel, with how long to spend, when to go and one tip for each. This is a beta; we are still adding to it.",
+      },
+      beta: { vi: "Bản thử nghiệm", en: "Beta" },
+      map: { vi: "Bản đồ", en: "Map" },
+      list: { vi: "Danh sách", en: "List" },
+      mapNote: {
+        vi: "Sơ đồ vẽ tay, vị trí chỉ mang tính tương đối. Bấm Mở trong Google Maps để dẫn đường.",
+        en: "Hand-drawn diagram; positions are approximate. Use Open in Google Maps to navigate.",
+      },
+      hotel: { vi: "Grandview Hotel", en: "Grandview Hotel" },
+      pickPlace: { vi: "Chọn một điểm trên bản đồ để xem chi tiết.", en: "Pick a place on the map to see the details." },
+      pickPlaceList: { vi: "Chọn một điểm trong danh sách để xem chi tiết.", en: "Pick a place from the list to see the details." },
+      timeLabel: { vi: "Nên dành", en: "Time needed" },
+      bestLabel: { vi: "Giờ đẹp", en: "Best time" },
+      feeLabel: { vi: "Vé", en: "Entry" },
+      distLabel: { vi: "Cách khách sạn", en: "From the hotel" },
+      maps: { vi: "Mở trong Google Maps", en: "Open in Google Maps" },
+      planTitle: { vi: "Gợi ý lịch trình", en: "Suggested itineraries" },
+      showOnMap: { vi: "Xem trên bản đồ", en: "Show on map" },
+      offMap: { vi: "Ngoài khung bản đồ", en: "Outside the map frame" },
+      empty: { vi: "Không có điểm nào trong nhóm này.", en: "No places in this group." },
+      eyebrow: { vi: "ĐÀ LẠT · GÓC NHÌN CỦA NGƯỜI Ở ĐÂY", en: "DA LAT · A LOCAL PERSPECTIVE" },
+      // Thời tiết
+      wEyebrow: { vi: "CAO NGUYÊN LÂM VIÊN", en: "LANG BIANG PLATEAU" },
+      wTitle: { vi: "Thời tiết sắp tới", en: "Weather ahead" },
+      wArea: { vi: "Khu vực dự báo", en: "Forecast area" },
+      wMeta: { vi: "7 ngày · °C · giờ Việt Nam", en: "7 days · °C · Vietnam time" },
+      wShared: { vi: "Dự báo dùng chung · cập nhật mỗi giờ", en: "Shared forecast · updated hourly" },
+      wDirect: { vi: "Dự báo trực tiếp từ Open-Meteo", en: "Live forecast from Open-Meteo" },
+      wLoading: { vi: "Đang tải dự báo…", en: "Loading the forecast…" },
+      wError: { vi: "Chưa tải được dự báo thời tiết.", en: "Could not load the forecast." },
+      wRetry: { vi: "Thử lại", en: "Try again" },
+      wStale: { vi: "Đang hiển thị bản dự báo cũ vì chưa cập nhật được. Hãy kiểm tra lại trước khi đi.", en: "Showing an older forecast because the update failed. Check again before you head out." },
+      wNote: { vi: "Thời tiết trên đồi và dưới thung lũng có thể khác nhau. Xem lại trước khi đi; những ngày càng xa càng kém chắc chắn.", en: "Weather differs between hilltops and valleys. Recheck before you go; later days are less certain." },
+      wSource: { vi: "Thời tiết: Open-Meteo ↗", en: "Weather: Open-Meteo ↗" },
+      wUpdated: { vi: "Cập nhật", en: "Updated" },
+      wToday: { vi: "Hôm nay", en: "Today" },
+      wHourly: { vi: "Dự báo theo giờ", en: "Hourly forecast" },
+      wPrecip: { vi: "Khả năng mưa", en: "Precipitation" },
+      wHumidity: { vi: "Độ ẩm", en: "Humidity" },
+      wWind: { vi: "Gió", en: "Wind" },
+      wGust: { vi: "Giật", en: "Gusts" },
+      wDays: { vi: "7 ngày", en: "7 days" },
+      wHigh: { vi: "Cao nhất", en: "Daily high" },
+      wLow: { vi: "Thấp nhất", en: "Daily low" },
+      // Dải liên hệ
+      feedback: { vi: "Có góp ý cho trang này?", en: "Have feedback on this page?" },
+      feedbackLink: { vi: "Nhắn lễ tân ↗", en: "Message reception ↗" },
+      callReception: { vi: "Lễ tân Grandview", en: "Grandview reception" },
+      bookRoom: { vi: "Đặt phòng ↗", en: "Book a room ↗" },
+      roomService: { vi: "Gọi dịch vụ phòng ↗", en: "Room service ↗" },
+      stripLabel: { vi: "Góp ý và liên hệ", en: "Feedback and contact" },
+      // Chân trang
+      footHome: { vi: "Trang chủ", en: "Home" },
+      footRooms: { vi: "Phòng nghỉ", en: "Rooms" },
+      footLookup: { vi: "Tra cứu đặt phòng", en: "Find my booking" },
+      footService: { vi: "Dịch vụ phòng", en: "Room service" },
+      foot: {
+        vi: "Trang thử nghiệm của Grandview Hotel. Giá vé và giờ mở cửa có thể thay đổi, nên hỏi lại lễ tân trước khi đi.",
+        en: "A Grandview Hotel beta. Fees and opening hours change, so check with reception before you set out.",
+      },
+    };
+
+    // Thông tin liên hệ hiển thị ở dải cuối trang. Mục nào để trống sẽ tự ẩn.
+    // Điền số điện thoại, Zalo, Facebook thật của khách sạn trước khi đưa lên mạng.
+    const CONTACT = {
+      phone: "",        // ví dụ: "+84263xxxxxxx"
+      phoneLabel: "",   // ví dụ: "0263 xxx xxxx"
+      zalo: "",         // ví dụ: "https://zalo.me/0xxxxxxxxx"
+      messenger: "",    // ví dụ: "https://m.me/ten-trang"
+      facebook: "",     // ví dụ: "https://www.facebook.com/ten-trang"
+    };
+
+    // Khu vực dự báo: khóa phải trùng với WEATHER_AREAS trong app/main.py.
+    const WEATHER_AREAS = [
+      { id: "da-lat", lat: 11.9404, lng: 108.4583, vi: "Đà Lạt", en: "Da Lat" },
+      { id: "langbiang", lat: 12.0470, lng: 108.4420, vi: "Langbiang", en: "Langbiang" },
+      { id: "tuyen-lam", lat: 11.8880, lng: 108.4280, vi: "Hồ Tuyền Lâm", en: "Tuyen Lam Lake" },
+      { id: "cau-dat", lat: 11.7740, lng: 108.5560, vi: "Cầu Đất", en: "Cau Dat" },
+    ];
+
+    const ICONS = {
+      sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+      partly: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 4.5v1.3M3.8 9.2h1.3M5.2 5.9l.9.9M11.8 5.9l-.9.9"/><path d="M11.4 9.6a3.3 3.3 0 0 0-5.9 1.9"/><path d="M7.5 19.5h10a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.5 1.4A2.8 2.8 0 0 0 7.5 19.5z"/></svg>',
+      cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6.5 18.5h11a4 4 0 0 0 .4-8 5.5 5.5 0 0 0-10.6 1.6A3.2 3.2 0 0 0 6.5 18.5z"/></svg>',
+      fog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6.5 12.5h11a3.5 3.5 0 0 0 .2-7A5 5 0 0 0 8 7.2 2.8 2.8 0 0 0 6.5 12.5z"/><path d="M4 16h16M6 19.5h12"/></svg>',
+      drizzle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 14h11a3.6 3.6 0 0 0 .3-7.2A5 5 0 0 0 8.2 8.4 2.9 2.9 0 0 0 6.5 14z"/><path d="M8.5 17.5v.5M12 18.5v.5M15.5 17.5v.5"/></svg>',
+      rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 13.5h11a3.6 3.6 0 0 0 .3-7.2A5 5 0 0 0 8.2 7.9 2.9 2.9 0 0 0 6.5 13.5z"/><path d="M8.5 16.5l-1 3M12.5 16.5l-1 3M16.5 16.5l-1 3"/></svg>',
+      storm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 13.5h11a3.6 3.6 0 0 0 .3-7.2A5 5 0 0 0 8.2 7.9 2.9 2.9 0 0 0 6.5 13.5z"/><path d="M12.5 14.5l-2.2 3.6h3l-2 3.4"/></svg>',
+      wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 9h11.5a2.5 2.5 0 1 0-2.5-2.5M3 13h15.5a2.5 2.5 0 1 1-2.5 2.5M3 17h8"/></svg>',
+      cold: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"/></svg>',
+    };
+
+    // Mã thời tiết WMO mà Open-Meteo trả về.
+    function weatherKind(code) {
+      if (code === 0) return { icon: "sun", tone: "sun", vi: "Trời quang", en: "Clear" };
+      if (code === 1 || code === 2) return { icon: "partly", tone: "sun", vi: "Ít mây", en: "Partly cloudy" };
+      if (code === 3) return { icon: "cloud", tone: "cloud", vi: "Nhiều mây", en: "Overcast" };
+      if (code === 45 || code === 48) return { icon: "fog", tone: "fog", vi: "Sương mù", en: "Fog" };
+      if (code >= 51 && code <= 57) return { icon: "drizzle", tone: "rain", vi: "Mưa phùn", en: "Drizzle" };
+      if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return { icon: "rain", tone: "rain", vi: "Mưa", en: "Rain" };
+      if (code >= 71 && code <= 86) return { icon: "cold", tone: "cloud", vi: "Mưa tuyết", en: "Snow" };
+      if (code >= 95) return { icon: "storm", tone: "storm", vi: "Giông", en: "Thunderstorms" };
+      return { icon: "cloud", tone: "cloud", vi: "Không rõ", en: "Unknown" };
+    }
+
+    const weather = { area: "da-lat", data: null, mode: null, status: "loading", request: 0 };
+
+    async function fetchWeather(areaId) {
+      // 1) Bản dự báo dùng chung, máy chủ đã lưu tạm (app/main.py: GET /api/weather).
+      try {
+        const response = await fetch(`/api/weather?area=${encodeURIComponent(areaId)}`, { headers: { Accept: "application/json" } });
+        if (response.ok) return { mode: "shared", data: await response.json() };
+      } catch (error) { /* chuyển sang dự phòng */ }
+      // 2) Dự phòng khi mở trang không qua FastAPI hoặc máy chủ không ra được Internet.
+      const area = WEATHER_AREAS.find(item => item.id === areaId);
+      const params = new URLSearchParams({
+        latitude: area.lat, longitude: area.lng, timezone: "Asia/Ho_Chi_Minh", forecast_days: "7",
+        daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        current: "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m",
+        hourly: "precipitation_probability",
+      });
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+      if (!response.ok) throw new Error(`Open-Meteo ${response.status}`);
+      const data = await response.json();
+      return { mode: "direct", data: { ...data, fetched_at: new Date().toISOString(), stale: false } };
+    }
+
+    async function loadWeather() {
+      const ticket = ++weather.request;
+      weather.status = "loading";
+      renderWeather();
+      try {
+        const result = await fetchWeather(weather.area);
+        if (ticket !== weather.request) return; // người dùng đã đổi khu vực
+        weather.data = result.data;
+        weather.mode = result.mode;
+        weather.status = "ready";
+      } catch (error) {
+        if (ticket !== weather.request) return;
+        weather.status = "error";
+      }
+      renderWeather();
+    }
+
+    const pad2 = value => String(value).padStart(2, "0");
+    function dayLabel(iso, index) {
+      const [year, month, day] = iso.split("-").map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      const name = index === 0 ? t("wToday")
+        : date.toLocaleDateString(state.lang === "vi" ? "vi-VN" : "en-GB", { weekday: "short", timeZone: "UTC" });
+      return { name, short: `${pad2(day)}/${pad2(month)}` };
+    }
+
+    function windWord(speed) {
+      if (speed < 6) return state.lang === "vi" ? "Lặng gió" : "Calm";
+      if (speed < 20) return state.lang === "vi" ? "Gió nhẹ" : "Breezy";
+      if (speed < 39) return state.lang === "vi" ? "Gió vừa" : "Windy";
+      return state.lang === "vi" ? "Gió mạnh" : "Strong wind";
+    }
+
+    function humidityWord(value) {
+      if (value >= 85) return state.lang === "vi" ? "Ẩm, dễ có sương" : "Humid, mist likely";
+      if (value >= 60) return state.lang === "vi" ? "Dễ chịu" : "Comfortable";
+      return state.lang === "vi" ? "Hanh khô" : "Dry";
+    }
+
+    function currentPrecip(data) {
+      const hourly = data.hourly || {};
+      const times = hourly.time || [];
+      const values = hourly.precipitation_probability || [];
+      const now = (data.current && data.current.time) || "";
+      const hourKey = now.slice(0, 13);
+      const index = times.findIndex(time => time.slice(0, 13) === hourKey);
+      if (index >= 0 && values[index] != null) return values[index];
+      const daily = data.daily.precipitation_probability_max || [];
+      return daily[0] ?? null;
+    }
+
+    function weatherNotices(data, precip) {
+      const vi = state.lang === "vi";
+      const current = data.current;
+      const today = weatherKind(data.daily.weather_code[0]);
+      const low = data.daily.temperature_2m_min[0];
+      const list = [];
+      if (today.tone === "storm" || weatherKind(current.weather_code).tone === "storm") {
+        list.push({ tone: "storm", icon: "storm", text: vi ? "Có thể có giông, hạn chế leo núi và chèo thuyền." : "Thunderstorms possible; avoid hikes and boat trips.", small: vi ? "Theo dõi lại trước khi lên Langbiang hoặc ra hồ." : "Check again before heading up Langbiang or onto the lake." });
+      } else if (precip != null && precip >= 50) {
+        list.push({ tone: "rain", icon: "rain", text: vi ? "Có thể mưa, nhớ mang áo mưa nhé!" : "Rain is possible — bring a raincoat!", small: vi ? "Lễ tân có cho mượn ô và áo mưa." : "Reception lends umbrellas and raincoats." });
+      }
+      if (weatherKind(current.weather_code).tone === "fog") {
+        list.push({ tone: "fog", icon: "fog", text: vi ? "Sương mù dày, lái xe chậm và bật đèn." : "Thick fog: drive slowly with lights on.", small: vi ? "Đường đèo Prenn và Mimosa dễ khuất tầm nhìn." : "The Prenn and Mimosa passes lose visibility first." });
+      }
+      if (current.wind_gusts_10m != null && current.wind_gusts_10m >= 40) {
+        list.push({ tone: "wind", icon: "wind", text: vi ? "Gió giật mạnh, cẩn thận khi đi xe máy." : "Strong gusts: take care on a motorbike.", small: `${vi ? "Giật" : "Gusts"} ${Math.round(current.wind_gusts_10m)} km/h` });
+      }
+      if (low != null && low <= 15) {
+        list.push({ tone: "cold", icon: "cold", text: vi ? `Sáng sớm và tối khoảng ${Math.round(low)}°, mang thêm áo ấm.` : `Early morning and night near ${Math.round(low)}°; pack a warm layer.`, small: vi ? "Trên đỉnh núi lạnh hơn trung tâm vài độ." : "Summits run a few degrees colder than town." });
+      }
+      if (!list.length && today.tone === "sun") {
+        list.push({ tone: "sun", icon: "sun", text: vi ? "Trời đẹp, hợp để đi dạo hồ và săn mây sớm." : "Fine weather for a lake walk and an early cloud hunt.", small: vi ? "Nắng cao nguyên mạnh, nhớ kem chống nắng." : "Highland sun is strong; wear sunscreen." });
+      }
+      return list;
+    }
+
+    function renderWeather() {
+      $("#weatherEyebrow").textContent = t("wEyebrow");
+      $("#weatherTitle").textContent = t("wTitle");
+      $("#weatherAreaLabel").textContent = t("wArea");
+      $("#weatherMeta").textContent = t("wMeta");
+      $("#weatherNote").textContent = t("wNote");
+      $("#weatherSource").textContent = t("wSource");
+      const select = $("#weatherArea");
+      select.innerHTML = WEATHER_AREAS.map(area =>
+        `<option value="${area.id}"${area.id === weather.area ? " selected" : ""}>${esc(area[state.lang])}</option>`).join("");
+
+      const content = $("#weatherContent");
+      const notices = $("#weatherNotices");
+      const stale = $("#weatherStale");
+      content.setAttribute("aria-busy", String(weather.status === "loading"));
+
+      if (weather.status === "loading" && !weather.data) {
+        content.innerHTML = `<div class="weather-status">${esc(t("wLoading"))}</div>`;
+        notices.hidden = true; stale.hidden = true;
+        $("#weatherSnapshot").textContent = ""; $("#weatherUpdated").textContent = "";
+        return;
+      }
+      if (weather.status === "error") {
+        content.innerHTML = `<div class="weather-status"><span>${esc(t("wError"))}</span><button type="button" id="weatherRetry">${esc(t("wRetry"))}</button></div>`;
+        notices.hidden = true; stale.hidden = true;
+        $("#weatherSnapshot").textContent = ""; $("#weatherUpdated").textContent = "";
+        return;
+      }
+
+      const data = weather.data;
+      const daily = data.daily;
+      const areaName = WEATHER_AREAS.find(area => area.id === weather.area)[state.lang];
+      $("#weatherSnapshot").textContent = weather.mode === "shared" ? t("wShared") : t("wDirect");
+
+      content.innerHTML = `<div class="weather-days" role="list" aria-label="${esc(`${areaName} · ${t("wMeta")}`)}">` +
+        daily.time.map((iso, index) => {
+          const kind = weatherKind(daily.weather_code[index]);
+          const label = dayLabel(iso, index);
+          const high = Math.round(daily.temperature_2m_max[index]);
+          const low = Math.round(daily.temperature_2m_min[index]);
+          const pop = daily.precipitation_probability_max ? daily.precipitation_probability_max[index] : null;
+          return `<div class="weather-day${index === 0 ? " weather-today" : ""}" role="listitem">
+            <time datetime="${iso}"><strong>${esc(label.name)}</strong><span>${label.short}</span></time>
+            <span class="weather-icon weather-${kind.tone}" role="img" aria-label="${esc(kind[state.lang])}" title="${esc(kind[state.lang])}">${ICONS[kind.icon]}</span>
+            <strong class="weather-high" aria-label="${esc(t("wHigh"))}: ${high}°C">${high}°</strong>
+            <span class="weather-low" aria-label="${esc(t("wLow"))}: ${low}°C">${low}°</span>
+            ${pop != null ? `<span class="weather-pop" aria-label="${esc(t("wPrecip"))}: ${pop}%">${pop}%</span>` : ""}
+          </div>`;
+        }).join("") + "</div>";
+
+      const current = data.current;
+      const kindNow = weatherKind(current.weather_code);
+      const precip = currentPrecip(data);
+      const hourText = (current.time || "").slice(11, 16);
+      notices.innerHTML = `
+        <div class="weather-notices-heading">${esc(t("wHourly"))} · <time datetime="${esc(current.time || "")}">${esc(hourText)}</time> · ${esc(areaName)} · ${Math.round(current.temperature_2m)}°C</div>
+        <div class="weather-condition weather-${kindNow.tone}"><span aria-hidden="true">${ICONS[kindNow.icon]}</span><strong>${esc(kindNow[state.lang])}</strong></div>
+        <div class="weather-metrics">
+          <div><span>${esc(t("wPrecip"))}</span><strong>${precip != null ? `${precip}%` : "—"}</strong></div>
+          <div><span>${esc(t("wHumidity"))}</span><strong>${Math.round(current.relative_humidity_2m)}%</strong><small>${esc(humidityWord(current.relative_humidity_2m))}</small></div>
+          <div><span>${esc(t("wWind"))}</span><strong>${Math.round(current.wind_speed_10m)} km/h</strong><small>${esc(windWord(current.wind_speed_10m))}${current.wind_gusts_10m != null ? `<span class="weather-gust">${esc(t("wGust"))} ${Math.round(current.wind_gusts_10m)} km/h</span>` : ""}</small></div>
+        </div>` +
+        weatherNotices(data, precip).slice(0, 3).map(notice => `
+        <div class="weather-notice weather-notice-${notice.tone}">
+          <span class="weather-notice-icon" aria-hidden="true">${ICONS[notice.icon]}</span>
+          <div><p>${esc(notice.text)}</p><small>${esc(notice.small)}</small></div>
+        </div>`).join("");
+      notices.setAttribute("aria-label", t("wHourly"));
+      notices.hidden = false;
+
+      stale.textContent = t("wStale");
+      stale.hidden = !data.stale;
+
+      const fetched = new Date(data.fetched_at);
+      const updated = $("#weatherUpdated");
+      if (!Number.isNaN(fetched.getTime())) {
+        updated.dateTime = fetched.toISOString();
+        const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+        }).formatToParts(fetched).map(part => [part.type, part.value]));
+        updated.textContent = `${t("wUpdated")} ${parts.day}/${parts.month}, ${parts.hour}:${parts.minute}`;
+      }
+    }
+
+    const SOCIAL_ICONS = {
+      zalo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 5.5h16v10.5H11l-4.5 3.5V16H4z"/><path d="M8 9h3.2L8 13h3.2M13.5 9v4M16 10.5a1.3 1.3 0 1 0 0 .01" stroke-linecap="round"/></svg>',
+      messenger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3.5c-4.8 0-8.5 3.5-8.5 8 0 2.5 1.2 4.6 3 6v3l2.8-1.6c.9.3 1.8.4 2.7.4 4.8 0 8.5-3.5 8.5-7.8S16.8 3.5 12 3.5z"/><path d="M7.5 13.5l3-3.2 2.2 2 3.8-2.8-3 3.3-2.2-2z" stroke-linecap="round"/></svg>',
+      facebook: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 8H17V4.5h-2.5A4 4 0 0 0 10.5 8.5V11H8v3.5h2.5v6h3.5v-6h2.6l.4-3.5h-3V8.8c0-.5.3-.8.5-.8z"/></svg>',
+    };
+
+    function renderConnect() {
+      const strip = $("#connectStrip");
+      strip.setAttribute("aria-label", t("stripLabel"));
+      const socials = ["zalo", "messenger", "facebook"].filter(key => CONTACT[key]).map(key =>
+        `<a href="${esc(CONTACT[key])}" target="_blank" rel="noopener noreferrer" aria-label="${key === "zalo" ? "Zalo" : key === "messenger" ? "Messenger" : "Facebook"}" title="${key === "zalo" ? "Zalo" : key === "messenger" ? "Messenger" : "Facebook"}">${SOCIAL_ICONS[key]}</a>`).join("");
+      const feedbackHref = CONTACT.zalo || CONTACT.messenger || (CONTACT.phone ? `tel:${CONTACT.phone}` : "/#contact");
+      strip.innerHTML = `
+        <p class="feedback-prompt">${esc(t("feedback"))}<a href="${esc(feedbackHref)}"${/^https?:/.test(feedbackHref) ? ' target="_blank" rel="noopener noreferrer"' : ""}>${esc(t("feedbackLink"))}</a></p>
+        ${CONTACT.phone ? `<a class="strip-phone" href="tel:${esc(CONTACT.phone)}">${esc(t("callReception"))} · ${esc(CONTACT.phoneLabel || CONTACT.phone)}</a>` : ""}
+        ${socials ? `<div class="strip-socials">${socials}</div>` : ""}
+        <div class="strip-actions">
+          <a class="secondary-button" href="/#rooms">${esc(t("bookRoom"))}</a>
+          <a class="secondary-button" href="/#room-service">${esc(t("roomService"))}</a>
+        </div>`;
+    }
+
+    function renderFoot() {
+      $("#exFoot").innerHTML = `
+        <div class="ex-foot-grid">
+          <nav class="ex-foot-links" aria-label="${state.lang === "vi" ? "Liên kết cuối trang" : "Footer links"}">
+            <a href="/">${esc(t("footHome"))}</a>
+            <a href="/#rooms">${esc(t("footRooms"))}</a>
+            <a href="/#lookup">${esc(t("footLookup"))}</a>
+            <a href="/#room-service">${esc(t("footService"))}</a>
+          </nav>
+          ${CONTACT.phone ? `<a href="tel:${esc(CONTACT.phone)}">${esc(t("callReception"))} · ${esc(CONTACT.phoneLabel || CONTACT.phone)}</a>` : ""}
+        </div>
+        <p class="ex-foot-note">${esc(t("foot"))}</p>`;
+    }
+
+    const state = { lang: "vi", view: "map", cat: "all", selected: null, day: 0 };
+    const $ = selector => document.querySelector(selector);
+    const esc = (value = "") => String(value).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[c]);
+    const t = key => T[key][state.lang];
+    const placeById = id => PLACES.find(place => place.id === id);
+
+    function readUrl() {
+      const params = new URLSearchParams(location.search);
+      if (params.get("lang") === "en") state.lang = "en";
+      if (params.get("view") === "list") state.view = "list";
+      const place = params.get("place");
+      if (place && placeById(place)) state.selected = place;
+      const area = params.get("weather");
+      if (area && WEATHER_AREAS.some(item => item.id === area)) weather.area = area;
+    }
+
+    function writeUrl() {
+      const params = new URLSearchParams();
+      params.set("lang", state.lang);
+      params.set("view", state.view);
+      if (state.selected) params.set("place", state.selected);
+      if (weather.area !== "da-lat") params.set("weather", weather.area);
+      history.replaceState(null, "", `${location.pathname}?${params}`);
+    }
+
+    function visiblePlaces() {
+      return state.cat === "all" ? PLACES : PLACES.filter(place => place.cat === state.cat);
+    }
+
+    function mapsLink(place) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name.vi} Đà Lạt`)}`;
+    }
+
+    // Vùng trung tâm nhiều điểm sát nhau, lệch nhẹ vài ghim cho dễ bấm.
+    const NUDGE = {
+      "cho-da-lat": [-4, -2.2],
+      "nha-tho-con-ga": [-1, 1.6],
+      "quang-truong-lam-vien": [3.5, 1.4],
+      "vuon-hoa-thanh-pho": [1, -2.4],
+      "crazy-house": [-2.5, 2.4],
+      "dinh-bao-dai": [-4, 0.8],
+    };
+
+    function position(lat, lng, id) {
+      const offset = NUDGE[id] || [0, 0];
+      const x = (lng - BOUNDS.lngMin) / (BOUNDS.lngMax - BOUNDS.lngMin) * 100 + offset[0];
+      const y = (BOUNDS.latMax - lat) / (BOUNDS.latMax - BOUNDS.latMin) * 100 + offset[1];
+      return { x: Math.min(97, Math.max(3, x)), y: Math.min(96, Math.max(3, y)) };
+    }
+
+    function renderPins() {
+      const frame = $("#mapFrame");
+      frame.querySelectorAll(".pin").forEach(pin => pin.remove());
+      const hotel = position(HOTEL.lat, HOTEL.lng);
+      const hotelPin = document.createElement("div");
+      hotelPin.className = "pin pin-hotel";
+      hotelPin.style.left = `${hotel.x}%`;
+      hotelPin.style.top = `${hotel.y}%`;
+      hotelPin.innerHTML = `<span class="pin-dot"><span>G</span></span><span class="pin-label">${esc(t("hotel"))}</span>`;
+      frame.append(hotelPin);
+
+      visiblePlaces().filter(place => !place.offMap).forEach((place, index) => {
+        const spot = position(place.lat, place.lng, place.id);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "pin";
+        button.dataset.place = place.id;
+        button.style.left = `${spot.x}%`;
+        button.style.top = `${spot.y}%`;
+        button.setAttribute("aria-pressed", String(state.selected === place.id));
+        button.innerHTML = `<span class="pin-dot"><span>${index + 1}</span></span>
+          <span class="pin-label">${esc(place.name[state.lang])}</span>`;
+        frame.append(button);
+      });
+
+      $("#mapLegend").innerHTML = visiblePlaces().filter(place => !place.offMap).map((place, index) =>
+        `<button type="button" data-place="${place.id}" aria-pressed="${state.selected === place.id}">
+           <b>${index + 1}</b>${esc(place.name[state.lang])}
+         </button>`).join("");
+    }
+
+    function renderList() {
+      const places = visiblePlaces();
+      if (!places.length) {
+        $("#placeGrid").innerHTML = `<p class="detail-empty">${esc(t("empty"))}</p>`;
+        return;
+      }
+      $("#placeGrid").innerHTML = places.map(place => `
+        <button type="button" class="place-card" data-place="${place.id}" aria-pressed="${state.selected === place.id}">
+          <h3>${esc(place.name[state.lang])}</h3>
+          <p>${esc(place.desc[state.lang].split(". ")[0].replace(/\.$/, ""))}.</p>
+          <span class="place-meta">
+            <span class="tag">${esc(place.time[state.lang])}</span>
+            <span class="tag">${place.km} km</span>
+            ${place.offMap ? `<span class="tag">${esc(t("offMap"))}</span>` : ""}
+          </span>
+        </button>`).join("");
+    }
+
+    function renderDetail() {
+      const place = state.selected ? placeById(state.selected) : null;
+      if (!place) {
+        $("#detail").innerHTML = `<p class="detail-empty">${esc(state.view === "map" ? t("pickPlace") : t("pickPlaceList"))}</p>`;
+        return;
+      }
+      $("#detail").innerHTML = `
+        <h2>${esc(place.name[state.lang])}</h2>
+        <p>${esc(place.desc[state.lang])}</p>
+        <dl>
+          <dt>${esc(t("timeLabel"))}</dt><dd>${esc(place.time[state.lang])}</dd>
+          <dt>${esc(t("bestLabel"))}</dt><dd>${esc(place.best[state.lang])}</dd>
+          <dt>${esc(t("feeLabel"))}</dt><dd>${esc(place.fee[state.lang])}</dd>
+          <dt>${esc(t("distLabel"))}</dt><dd>${place.km} km</dd>
+        </dl>
+        <p class="detail-tip">${esc(place.tip[state.lang])}</p>
+        <div class="detail-actions">
+          <a class="secondary-button" href="${mapsLink(place)}" target="_blank" rel="noopener">${esc(t("maps"))}</a>
+        </div>`;
+    }
+
+    function renderPlan() {
+      $("#planTitle").textContent = t("planTitle");
+      $("#planTabs").innerHTML = ITINERARY.map((day, index) =>
+        `<button type="button" role="tab" data-day="${index}" aria-selected="${index === state.day}">${esc(day.day[state.lang])}</button>`).join("");
+      const day = ITINERARY[state.day];
+      $("#planDay").innerHTML = `<p>${esc(day.lead[state.lang])}</p>` + day.stops.map(stop => {
+        const place = placeById(stop.place) || placeById(stop.fallback);
+        if (!place) return "";
+        return `<div class="plan-stop">
+          <span class="plan-time">${esc(stop.time[state.lang])}</span>
+          <div>
+            <strong>${esc(place.name[state.lang])}</strong>
+            <p>${esc(stop.note[state.lang])}</p>
+            <button type="button" data-plan-place="${place.id}">${esc(t("showOnMap"))}</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderChrome() {
+      document.documentElement.lang = state.lang;
+      $("#pageTitle").textContent = t("title");
+      $("#pageLead").textContent = t("lead");
+      $("#betaTag").textContent = t("beta");
+      $("#mapNote").textContent = t("mapNote");
+      $("#pageEyebrow").textContent = t("eyebrow");
+      document.title = `${t("title")} | Grandview Hotel`;
+      $("#viewSwitch").querySelectorAll("[data-view]").forEach(button => {
+        button.textContent = t(button.dataset.view);
+        button.setAttribute("aria-pressed", String(button.dataset.view === state.view));
+      });
+      $("#langSwitch").querySelectorAll("[data-lang]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.lang === state.lang));
+      });
+      $("#catFilter").innerHTML = CATEGORIES.map(category =>
+        `<button type="button" data-cat="${category.id}" aria-pressed="${category.id === state.cat}">${esc(category[state.lang])}</button>`).join("");
+      $("#mapView").hidden = state.view !== "map";
+      $("#listView").hidden = state.view !== "list";
+    }
+
+    function render() {
+      renderChrome();
+      if (state.view === "map") renderPins(); else renderList();
+      renderDetail();
+      renderPlan();
+      renderWeather();
+      renderConnect();
+      renderFoot();
+      writeUrl();
+    }
+
+    function select(id) {
+      state.selected = state.selected === id ? null : id;
+      render();
+    }
+
+    document.addEventListener("click", event => {
+      const lang = event.target.closest("[data-lang]");
+      if (lang) { state.lang = lang.dataset.lang; render(); return; }
+      const view = event.target.closest("[data-view]");
+      if (view) { state.view = view.dataset.view; render(); return; }
+      const cat = event.target.closest("[data-cat]");
+      if (cat) {
+        state.cat = cat.dataset.cat;
+        const current = state.selected ? placeById(state.selected) : null;
+        if (current && state.cat !== "all" && current.cat !== state.cat) state.selected = null;
+        render();
+        return;
+      }
+      const planPlace = event.target.closest("[data-plan-place]");
+      if (planPlace) {
+        const place = placeById(planPlace.dataset.planPlace);
+        state.cat = "all";
+        state.view = place.offMap ? "list" : "map";
+        state.selected = place.id;
+        render();
+        $("#mapView").hidden ? $("#listView").scrollIntoView({ behavior: "smooth", block: "start" })
+                             : $("#mapView").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      const pin = event.target.closest("[data-place]");
+      if (pin) { select(pin.dataset.place); return; }
+      const day = event.target.closest("[data-day]");
+      if (day) { state.day = Number(day.dataset.day); renderPlan(); return; }
+      if (event.target.closest("#weatherRetry")) loadWeather();
+    });
+
+    $("#weatherArea").addEventListener("change", event => {
+      weather.area = event.target.value;
+      weather.data = null;
+      writeUrl();
+      loadWeather();
+    });
+
+    readUrl();
+    render();
+    loadWeather();
+    // Trang để mở lâu (ví dụ ở sảnh) vẫn tự cập nhật mỗi giờ.
+    setInterval(loadWeather, 60 * 60 * 1000);
+  })();
+  </script>
+</body>
+</html>

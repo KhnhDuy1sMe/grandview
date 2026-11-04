@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="256" height="256">
+  <title>Grandview</title>
+  <path d="M8 60V30a24 24 0 0 1 48 0v30z" fill="#2C3A2E"/>
+  <circle cx="41" cy="25" r="6" fill="#C9A45C"/>
+  <path d="M15 52l9-20 9 20z M27 52l8-15 8 15z M37 52l7-12 7 12z" fill="#F5F2EA"/>
+  <rect x="12" y="52" width="40" height="2.5" rx="1.25" fill="#F5F2EA"/>
+</svg>

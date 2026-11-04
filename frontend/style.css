@@ -1,0 +1,629 @@
+/* ==========================================================
+   Grandview Hotel — Trang khách (giao diện "tờ giấy giữa rừng")
+   Trang nằm trên một tờ giấy màu kem đặt trên nền rừng thông tối.
+   Tên token giữ nguyên để dich-vu.html dùng chung file này.
+   ========================================================== */
+
+:root {
+  /* Màu chính */
+  --pine: #2C3A2E;          /* chữ chính, nền tối */
+  --pine-soft: #3E4D3C;
+  --forest: #1D2620;        /* nền ngoài tờ giấy */
+  --mist: #F5F2EA;          /* giấy kem */
+  --paper: #FBF9F3;         /* thẻ trắng ngà */
+  --cloud: #DAD5C6;         /* viền đậm */
+  --line: #E6E1D3;          /* viền nhạt */
+  --jade: #5A6B43;          /* xanh rêu, nút chính */
+  --jade-deep: #46552F;
+  --jade-tint: #E7EAD9;
+  --jade-light: #D3DCB4;
+  --moss: #4F5F3A;          /* tiêu đề */
+  --honey: #C9A45C;         /* nắng: mặt trời logo, giá trên nền tối */
+  --white: #FFFFFF;
+  --stone: #6E6B5E;
+
+  /* Màu trạng thái */
+  --st-available: #4F7A4A;
+  --st-available-bg: #E5EEDF;
+  --st-occupied: #3F5F86;
+  --st-occupied-bg: #E3EAF2;
+  --st-cleaning: #A2731F;
+  --st-cleaning-bg: #F5ECD9;
+  --st-maintenance: #9C3B2E;
+  --st-maintenance-bg: #F5E2DD;
+
+  /* Chữ */
+  --sans: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --script: "Great Vibes", "Newsreader", Georgia, serif;
+  --font-sans: var(--sans);
+  --font-serif: var(--serif);
+  --font-script: var(--script);
+
+  /* Hình khối */
+  --radius-s: 8px;
+  --radius-m: 16px;
+  --radius-l: 22px;
+  --radius-pill: 999px;
+
+  /* Chỉ hai bóng: tờ giấy và thẻ nổi trên ảnh */
+  --shadow-sheet: 0 30px 80px rgba(0, 0, 0, .35);
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, .12);
+  --page-w: 1200px;
+  --pad: clamp(1rem, 2.5vw, 1.75rem);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--pine);
+  background: var(--mist);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p { margin: 0; }
+h1, h2, h3 { font-weight: 400; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+ul { margin: 0; padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: progress; }
+svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+:focus-visible { outline: 2px solid var(--jade); outline-offset: 3px; border-radius: 4px; }
+.muted { color: var(--stone); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.skip-link {
+  position: absolute; left: 1rem; top: -3rem; z-index: 100;
+  padding: .5rem 1rem; border-radius: var(--radius-s);
+  background: var(--paper); color: var(--pine); text-decoration: none; font-weight: 600;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ---------- Nền rừng và tờ giấy (chỉ trang chủ) ---------- */
+body:has(> .page) {
+  background:
+    linear-gradient(rgba(20, 28, 22, .72), rgba(20, 28, 22, .82)),
+    var(--forest) url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=40") center / cover fixed;
+}
+.page {
+  width: min(var(--page-w), calc(100% - 2.5rem));
+  margin: 1.5rem auto;
+  padding: 0 var(--pad);
+  background: var(--mist);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-sheet);
+}
+
+/* ---------- Chữ trang trí ---------- */
+.display {
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.1rem);
+  font-weight: 300; line-height: 1.12; letter-spacing: -.02em;
+  color: var(--moss);
+}
+.display-light { color: var(--white); }
+.script, .accent {
+  font-family: var(--script);
+  font-style: normal; font-weight: 400;
+  font-size: 1.22em; line-height: .9; letter-spacing: 0;
+}
+
+/* ---------- Nút và liên kết ---------- */
+.search-btn, .login-btn, .gold-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 46px; padding: .7rem 1.4rem;
+  border: 0; border-radius: var(--radius-pill);
+  background: var(--jade); color: var(--white);
+  font-size: .9rem; font-weight: 500; text-decoration: none;
+  transition: background .15s;
+}
+.search-btn:hover, .login-btn:hover, .gold-btn:hover { background: var(--jade-deep); }
+.search-btn-light { background: var(--jade-light); color: var(--pine); }
+.search-btn-light:hover { background: var(--white); }
+
+.secondary-button, .account-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  min-height: 42px; padding: .55rem 1.1rem;
+  border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+  background: transparent; font-size: .875rem; font-weight: 500; text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.secondary-button:hover, .account-btn:hover { border-color: var(--pine); background: var(--paper); }
+
+.text-link {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .9rem; font-weight: 500; color: var(--moss); text-decoration: none;
+  border-bottom: 1px solid var(--cloud); padding-bottom: 2px;
+}
+.text-link:hover { border-bottom-color: currentColor; }
+
+.pill-btn {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: .75rem;
+  width: 100%; padding: .35rem .35rem .35rem 1rem;
+  border-radius: var(--radius-pill); background: var(--jade); color: var(--white);
+  font-size: .85rem; font-weight: 500; text-decoration: none;
+}
+.pill-btn:hover { background: var(--jade-deep); }
+.pill-btn-icon {
+  display: grid; place-items: center; width: 32px; height: 32px;
+  border-radius: 50%; background: var(--paper); color: var(--jade-deep);
+}
+
+/* ---------- Thẻ nhỏ dạng viên ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: .45rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .32rem .85rem; border-radius: var(--radius-pill);
+  font-size: .8rem; line-height: 1.3; white-space: nowrap;
+}
+.chip-glass {
+  color: var(--white);
+  background: rgba(255, 255, 255, .14);
+  border: 1px solid rgba(255, 255, 255, .45);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.chip-line { border: 1px solid var(--cloud); color: var(--pine-soft); }
+.badge-outline {
+  display: inline-block; margin-left: .4rem; padding: .05rem .5rem;
+  border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+  font-size: .7rem; font-weight: 500; color: var(--stone); vertical-align: middle;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: relative;
+  display: flex; align-items: center; gap: 1.5rem;
+  padding: 1.1rem 0;
+}
+.brand { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; }
+.brand-logo { flex-shrink: 0; width: 2.25rem; height: 2.25rem; }
+.brand-logo svg { width: 100%; height: 100%; stroke: none; }
+.mark-arch { fill: var(--pine); }
+.mark-sun { fill: var(--honey); }
+.mark-tree, .mark-ground { fill: var(--mist); }
+.brand-reverse .mark-arch { fill: var(--mist); }
+.brand-reverse .mark-tree, .brand-reverse .mark-ground { fill: var(--pine); }
+.brand-words { display: flex; flex-direction: column; }
+.brand-mark, .brand-name { font-family: var(--script); font-size: 1.9rem; line-height: 1.05; color: var(--moss); }
+.brand-sub { font-size: .75rem; color: var(--stone); }
+#mainNav { display: flex; gap: 1.2rem; margin-inline: auto; white-space: nowrap; }
+#mainNav a { font-size: .85rem; text-decoration: none; color: var(--pine-soft); padding: .3rem 0; border-bottom: 1px solid transparent; }
+#mainNav a:hover { border-bottom-color: var(--cloud); }
+.header-actions { display: flex; align-items: center; gap: .6rem; white-space: nowrap; }
+.login-btn { min-height: 42px; padding: .55rem 1.2rem; }
+
+.menu-toggle { display: none; position: relative; width: 42px; height: 42px; border: 1px solid var(--cloud); border-radius: 50%; background: none; }
+.menu-toggle span { position: absolute; left: 12px; right: 12px; height: 1.5px; background: currentColor; }
+.menu-toggle span:first-child { top: 16px; }
+.menu-toggle span:last-child { top: 24px; }
+
+/* ---------- Hero ---------- */
+.hero-media {
+  position: relative; overflow: hidden;
+  min-height: clamp(460px, 68vh, 620px);
+  border-radius: var(--radius-m);
+  background: var(--pine-soft);
+  color: var(--white);
+}
+.hero-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(18, 26, 20, .62) 0%, rgba(18, 26, 20, .25) 55%, rgba(18, 26, 20, 0) 80%),
+    linear-gradient(0deg, rgba(18, 26, 20, .55) 0%, rgba(18, 26, 20, 0) 40%);
+}
+.hero-chips { position: absolute; top: 1.25rem; left: 1.25rem; max-width: 60%; }
+.hero-copy {
+  position: absolute; left: clamp(1.25rem, 3vw, 2.25rem); top: 50%; transform: translateY(-50%);
+  max-width: min(640px, 62%);
+}
+.hero h1 {
+  font-size: clamp(2.3rem, 1.4rem + 3.6vw, 4.1rem);
+  font-weight: 300; line-height: 1.08; letter-spacing: -.02em;
+  text-wrap: balance;
+}
+.hero-link {
+  display: inline-flex; align-items: center; gap: .5rem; margin-top: 1.25rem;
+  font-size: .9rem; color: var(--white); text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .5); padding-bottom: 2px;
+}
+.hero-link:hover { border-bottom-color: var(--white); }
+.hero-caption {
+  position: absolute; left: clamp(1.25rem, 3vw, 2.25rem); bottom: 1.4rem;
+  max-width: 36ch; font-size: .82rem; color: rgba(255, 255, 255, .85);
+}
+.hero-card {
+  position: absolute; right: 1.25rem; bottom: 1.25rem;
+  width: 250px; padding: .5rem .5rem .6rem;
+  background: var(--paper); color: var(--pine);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-float);
+}
+.hero-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 11px; }
+.hero-card p { margin: .6rem .35rem .7rem; font-size: .82rem; line-height: 1.45; }
+
+/* Thanh tìm phòng */
+.booking-bar {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end; gap: .75rem;
+  margin-top: .9rem; padding: .75rem .75rem .75rem 1.25rem;
+  background: var(--paper);
+  border: 1px solid var(--line); border-radius: var(--radius-m);
+}
+.booking-field { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.booking-field small { font-size: .75rem; color: var(--stone); }
+.booking-field input, .booking-field select {
+  width: 100%; min-height: 44px; padding: .5rem .75rem;
+  border: 1px solid var(--line); border-radius: var(--radius-pill);
+  background: var(--white); font-size: .92rem;
+}
+
+/* ---------- Giới thiệu ---------- */
+.intro {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem 4rem; align-items: start;
+  padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2.5rem, 5vw, 4rem);
+}
+.intro-copy { display: flex; flex-direction: column; gap: .9rem; font-size: .92rem; color: var(--pine-soft); max-width: 58ch; }
+.intro-copy .text-link { align-self: flex-end; margin-top: .4rem; }
+
+/* ---------- Banner tiện ích ---------- */
+.feature-banner {
+  position: relative; overflow: hidden;
+  min-height: 300px; border-radius: var(--radius-m);
+  display: flex; align-items: flex-start;
+}
+.feature-banner > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.feature-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18, 26, 20, .7), rgba(18, 26, 20, .15)); }
+.feature-content { position: relative; padding: clamp(1.5rem, 3vw, 2.25rem); max-width: 720px; }
+.feature-content h2 { margin-bottom: 1.4rem; }
+.feature-link {
+  position: absolute; right: 1.5rem; bottom: 1.4rem;
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .88rem; color: var(--white); text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .5); padding-bottom: 2px;
+}
+
+/* ---------- Phòng nghỉ ---------- */
+.rooms-section { padding-top: clamp(3rem, 6vw, 5rem); }
+.section-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.rooms-status { font-size: .85rem; color: var(--stone); margin: -0.75rem 0 1rem; }
+.rooms-status:empty { display: none; }
+.room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.room-card {
+  position: relative; overflow: hidden;
+  aspect-ratio: 4 / 5; border-radius: var(--radius-m);
+  background: var(--pine-soft); color: var(--white);
+}
+.room-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease); }
+.room-card:hover > img { transform: scale(1.03); }
+.room-card::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(0deg, rgba(18, 26, 20, .78) 0%, rgba(18, 26, 20, 0) 50%);
+}
+.room-overlay {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+  display: flex; flex-direction: column; gap: .7rem; padding: 1rem;
+}
+.room-name-row { display: flex; justify-content: space-between; align-items: baseline; gap: .75rem; flex-wrap: wrap; }
+.room-name-row h3 { font-size: 1.15rem; font-weight: 500; }
+.room-name-row p { font-size: .82rem; }
+.room-name-row strong { font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.room-detail-link {
+  align-self: flex-start; min-height: 38px; padding: .4rem 1rem;
+  border: 1px solid rgba(255, 255, 255, .45); border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, .14); color: var(--white); font-size: .82rem; font-weight: 500;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.room-detail-link:hover { background: rgba(255, 255, 255, .26); }
+
+/* Cấu trúc hạng phòng */
+.room-type-modal { max-width: 620px; }
+.room-gallery { margin: 1rem 0 .6rem; }
+.room-gallery img {
+  width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover;
+
+  border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--mist);
+}
+.room-gallery img.is-plan { object-fit: contain; background: var(--paper); }
+.room-gallery figcaption { margin-top: .4rem; font-size: .78rem; color: var(--stone); }
+.room-gallery-thumbs { display: flex; gap: .5rem; flex-wrap: wrap; }
+.room-gallery-thumbs button {
+  padding: 0; border: 1px solid var(--cloud); border-radius: 10px; overflow: hidden; background: var(--mist);
+}
+.room-gallery-thumbs button[aria-pressed="true"] { border-color: var(--jade); box-shadow: 0 0 0 2px var(--jade-tint); }
+.room-gallery-thumbs img { display: block; width: 84px; height: 64px; object-fit: cover; }
+.room-layout {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .35rem 1rem;
+  margin: 1.1rem 0; font-size: .88rem;
+}
+.room-layout dt { color: var(--stone); }
+.room-layout dd { margin: 0; }
+.room-type-modal .chip-row { margin-bottom: 1.1rem; }
+.room-arrow {
+  position: absolute; top: .85rem; right: .85rem; z-index: 2;
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border: 1px solid rgba(255, 255, 255, .7); border-radius: 50%;
+  background: rgba(255, 255, 255, .18); color: var(--white);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-size: 1.1rem;
+  transition: background .15s, color .15s;
+}
+.room-arrow:hover, .room-card:hover .room-arrow { background: var(--paper); color: var(--pine); }
+.room-card.is-bookable { cursor: pointer; }
+.room-empty {
+  grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center;
+  border: 1px dashed var(--cloud); border-radius: var(--radius-m); color: var(--stone);
+}
+
+/* ---------- Dịch vụ ---------- */
+.services-section { padding-top: clamp(3rem, 6vw, 5rem); }
+.section-lead { max-width: 60ch; margin: .75rem 0 1.5rem; font-size: .92rem; color: var(--stone); }
+.services-more { display: inline-flex; margin-top: 1.25rem; }
+.tool-note a, .form-error a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.service-row {
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.4fr) 44px;
+  align-items: center; gap: 1rem;
+  padding: 1rem 0; border-top: 1px solid var(--line);
+}
+.service-row-head { padding: .5rem 0; border-top: 0; font-size: .75rem; color: var(--stone); }
+.service-row-head span:nth-child(3) { text-align: right; }
+.service-name { font-size: 1.05rem; }
+.service-price { font-size: .85rem; color: var(--stone); }
+.service-price strong { font-size: 1.05rem; font-weight: 500; color: var(--pine); font-variant-numeric: tabular-nums; }
+.service-row .chip-row { justify-content: flex-end; }
+.row-arrow {
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: 50%; color: var(--moss); text-decoration: none; font-size: 1.2rem;
+  transition: background .15s;
+}
+.row-arrow:hover { background: var(--jade-tint); }
+
+/* ---------- Công cụ cho khách đã đặt ---------- */
+.guest-tools { padding: clamp(3rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3rem); }
+.guest-tools h2 { margin-bottom: 1.5rem; }
+.guest-tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.tool-card {
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-m);
+}
+.tool-card h3 { font-size: 1.4rem; font-weight: 400; color: var(--moss); margin-bottom: .4rem; }
+.tool-card > p { font-size: .9rem; }
+.tool-card-dark { background: var(--pine); border-color: var(--pine); color: rgba(255, 255, 255, .88); }
+.tool-card-dark h3 { color: var(--white); }
+.tool-form { display: flex; flex-direction: column; gap: .45rem; margin-top: 1.1rem; }
+.tool-form label { font-size: .8rem; font-weight: 500; }
+.tool-form input {
+  min-height: 48px; padding: .6rem 1rem;
+  border: 1px solid var(--cloud); border-radius: var(--radius-pill);
+  background: var(--white); color: var(--pine); font-size: 1rem;
+}
+.tool-form input:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px var(--jade-tint); }
+.tool-card-dark .tool-form input { border-color: transparent; }
+.tool-note { margin-top: .9rem; font-size: .78rem; opacity: .8; }
+.form-error, .auth-error { min-height: 1.2em; font-size: .82rem; color: var(--st-maintenance); }
+.form-error:empty, .auth-error:empty { min-height: 0; }
+.tool-card-dark .form-error { color: #F2B8AE; }
+
+.room-choice { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, .15); font-size: .88rem; }
+.room-choice-list { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+.room-choice-list button {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: .55rem 1rem; border: 1px solid rgba(255, 255, 255, .35); border-radius: var(--radius-s);
+  background: transparent; color: var(--white); font-weight: 600; font-size: .9rem;
+}
+.room-choice-list button:hover { background: rgba(255, 255, 255, .1); }
+.room-choice-list small { font-weight: 400; font-size: .75rem; opacity: .75; }
+
+/* Kết quả tra cứu */
+.lookup-result { margin-top: 1.25rem; }
+.lookup-count { font-size: .85rem; color: var(--stone); margin-bottom: .75rem; }
+.lookup-booking-card {
+  padding: 1rem 1.1rem; margin-bottom: .75rem;
+  background: var(--white); border: 1px solid var(--line); border-left: 3px solid var(--cloud);
+  border-radius: var(--radius-s);
+}
+.lookup-booking-card.checked_in { border-left-color: var(--st-occupied); }
+.lookup-booking-card.confirmed { border-left-color: var(--jade); }
+.lookup-booking-card.pending { border-left-color: var(--st-cleaning); }
+.lookup-result-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.lookup-result-heading small { font-size: .75rem; color: var(--stone); }
+.lookup-code { margin-top: .1rem; font-size: .92rem; font-weight: 600; letter-spacing: .02em; word-break: break-all; font-variant-numeric: tabular-nums; }
+.lookup-copy {
+  margin-top: .35rem; padding: 0; border: 0; background: none;
+  font-size: .8rem; font-weight: 500; color: var(--moss);
+  text-decoration: underline; text-decoration-color: var(--cloud); text-underline-offset: 3px;
+}
+.lookup-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .55rem 1.25rem;
+  margin: .85rem 0; padding: .85rem 0; border-block: 1px solid var(--line);
+}
+.lookup-detail-grid dt { font-size: .75rem; color: var(--stone); }
+.lookup-detail-grid dd { margin: 0; font-size: .9rem; }
+.lookup-money { display: grid; grid-template-columns: 1fr auto; gap: .3rem 0; margin: 0; font-variant-numeric: tabular-nums; font-size: .9rem; }
+.lookup-money dt { color: var(--stone); padding-right: 1rem; }
+.lookup-money dd { margin: 0; text-align: right; }
+.lookup-money .lookup-money-total { padding-top: .5rem; margin-top: .2rem; border-top: 1px solid var(--pine); color: var(--pine); font-weight: 600; }
+.lookup-money dd.lookup-money-total { font-size: 1.15rem; }
+.lookup-service-btn { margin-top: 1rem; }
+.lookup-result-footnote { margin-top: .75rem; font-size: .78rem; color: var(--stone); }
+
+/* Huy hiệu trạng thái (dùng chung với dich-vu.html) */
+.status-badge {
+  display: inline-block; width: fit-content; white-space: nowrap;
+  padding: .12rem .6rem; border-radius: var(--radius-pill);
+  font-size: .75rem; font-weight: 600;
+  background: var(--jade-tint); color: var(--stone);
+}
+.status-badge.pending { background: var(--st-cleaning-bg); color: var(--st-cleaning); }
+.status-badge.confirmed, .status-badge.completed, .status-badge.checked_out { background: var(--st-available-bg); color: var(--st-available); }
+.status-badge.checked_in, .status-badge.in_progress { background: var(--st-occupied-bg); color: var(--st-occupied); }
+.status-badge.rejected, .status-badge.cancelled { background: var(--st-maintenance-bg); color: var(--st-maintenance); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin: 0 calc(var(--pad) * -1);
+  padding: 2rem var(--pad) 1.5rem;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-l) var(--radius-l);
+  font-size: .85rem;
+}
+.footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; }
+.footer-top p { color: var(--stone); margin-top: .35rem; }
+.footer-brand .brand-mark { font-size: 1.7rem; }
+.footer-brand .brand-logo { width: 2rem; height: 2rem; }
+.footer-nav { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+.footer-nav a { text-decoration: none; color: var(--pine-soft); }
+.footer-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.footer-bottom { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .78rem; color: var(--stone); }
+
+/* ---------- Hộp thoại ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 70;
+  display: grid; place-items: center; padding: 1rem;
+  background: rgba(18, 26, 20, .55);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+.auth-modal {
+  position: relative; width: min(460px, 100%); max-height: calc(100vh - 2rem);
+  overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+  padding: 1.75rem;
+  background: var(--mist); border-radius: var(--radius-l);
+  box-shadow: var(--shadow-sheet);
+}
+.auth-modal h2 { font-size: 1.6rem; font-weight: 300; color: var(--moss); margin-bottom: .35rem; padding-right: 2rem; }
+.auth-intro { font-size: .88rem; color: var(--stone); margin-bottom: 1.1rem; }
+.auth-modal form { display: flex; flex-direction: column; gap: .8rem; }
+.auth-modal label { display: flex; flex-direction: column; gap: .3rem; font-size: .82rem; font-weight: 500; }
+.auth-modal label small { font-weight: 400; color: var(--stone); }
+.auth-modal::-webkit-scrollbar { width: 0; height: 0; }
+.auth-modal input, .auth-modal textarea {
+  padding: .65rem .9rem; border: 1px solid var(--cloud); border-radius: 12px;
+  background: var(--white); font-size: .95rem; font-weight: 400;
+}
+.auth-modal input:focus, .auth-modal textarea:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px var(--jade-tint); }
+.req { color: var(--st-maintenance); }
+.auth-submit { width: 100%; margin-top: .25rem; }
+.auth-footnote { margin-top: 1rem; font-size: .78rem; color: var(--stone); text-align: center; }
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  width: 36px; height: 36px; border: 0; border-radius: 50%;
+  background: var(--paper); font-size: 1.4rem; line-height: 1; color: var(--stone);
+}
+.modal-close:hover { color: var(--pine); }
+.booking-code-panel {
+  display: flex; flex-direction: column; gap: .35rem;
+  padding: 1rem 1.1rem; margin-bottom: .9rem;
+  background: var(--pine); color: var(--white); border-radius: var(--radius-s);
+}
+.booking-code-panel small { font-size: .75rem; opacity: .75; }
+.booking-code-panel strong { font-size: 1rem; letter-spacing: .03em; word-break: break-all; }
+.booking-code-panel .secondary-button { align-self: flex-start; color: var(--white); border-color: rgba(255, 255, 255, .4); min-height: 36px; }
+.booking-code-panel .secondary-button:hover { background: rgba(255, 255, 255, .1); border-color: var(--white); }
+.booking-success-total { font-size: .9rem; margin-bottom: 1rem; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 80;
+  max-width: min(380px, calc(100% - 2rem));
+  padding: .85rem 1.15rem; border-radius: 12px;
+  background: var(--pine); color: var(--white); font-size: .875rem;
+  opacity: 0; transform: translateY(.75rem); pointer-events: none;
+  transition: opacity .2s, transform .2s var(--ease);
+}
+.toast.show { opacity: 1; transform: none; }
+.toast.error { background: var(--st-maintenance); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1240px) {
+  #mainNav {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 40;
+    display: none; flex-direction: column; gap: 0;
+    padding: .5rem; background: var(--paper);
+    border: 1px solid var(--line); border-radius: var(--radius-m);
+    box-shadow: var(--shadow-float);
+  }
+  #mainNav.open { display: flex; }
+  #mainNav a { padding: .75rem 1rem; border-radius: var(--radius-s); border: 0; }
+  #mainNav a:hover { background: var(--jade-tint); }
+  .menu-toggle { display: block; }
+  .header-actions { margin-left: auto; }
+  .brand-sub { display: none; }
+}
+
+
+@media (max-width: 860px) {
+  .page { width: 100%; margin: 0; border-radius: 0; box-shadow: none; }
+  body:has(> .page) { background: var(--mist); }
+  .account-btn { min-height: 38px; padding: .4rem .8rem; font-size: .8rem; }
+  .hero-media { min-height: 600px; }
+  .hero-copy { top: auto; bottom: 9.5rem; transform: none; max-width: calc(100% - 2.5rem); }
+  .hero-chips { max-width: calc(100% - 2.5rem); }
+  .hero-caption { display: none; }
+  .hero-card {
+    left: 1.25rem; right: 1.25rem; bottom: 1.25rem; width: auto;
+    display: grid; grid-template-columns: 72px 1fr; align-items: center; gap: .5rem .75rem;
+  }
+  .hero-card img { height: 72px; grid-row: span 2; }
+  .hero-card p { margin: 0; }
+  .booking-bar { grid-template-columns: 1fr 1fr; padding: 1rem; }
+  .booking-bar .booking-field:nth-child(3), .booking-bar .search-btn { grid-column: span 2; }
+  .intro { grid-template-columns: 1fr; }
+  .intro-copy .text-link { align-self: flex-start; }
+  .feature-link { position: static; margin: 0 1.5rem 1.5rem; }
+  .feature-banner { flex-direction: column; justify-content: flex-end; }
+  .service-row { grid-template-columns: minmax(0, 1fr) auto; gap: .35rem 1rem; }
+  .service-row-head { display: none; }
+  .service-row .chip-row { grid-column: 1; justify-content: flex-start; }
+  .service-row .row-arrow { grid-row: 1 / span 3; grid-column: 2; }
+  .service-price { grid-column: 1; }
+  .guest-tools-grid { grid-template-columns: 1fr; }
+  .site-footer { border-radius: 0; }
+}
+
+@media (max-width: 560px) {
+  .header-actions .login-btn { display: none; }
+  .brand-logo { width: 1.75rem; height: 1.75rem; }
+  .brand-mark, .brand-name { font-size: 1.45rem; }
+  .brand { gap: .45rem; }
+  .room-card { aspect-ratio: 4 / 4.4; }
+  .login-btn { padding-inline: 1rem; }
+  .lookup-detail-grid { grid-template-columns: 1fr; }
+  .toast { right: 1rem; bottom: 1rem; }
+}
+
+/* Dưới 400px: chỉ giữ biểu tượng ở đầu trang để thanh điều hướng không tràn ngang */
+@media (max-width: 400px) {
+  .site-header .brand-mark, .rs-head .brand-mark { display: none; }
+  .site-header .brand-logo, .rs-head .brand-logo { width: 2rem; height: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+.brand-sub { white-space: nowrap; }
+@media (max-width: 1340px) { .brand-sub { display: none; } }
+
+/* Tìm phòng: nút quay lại hạng phòng, nhãn số phòng */
+.link-button {
+  display: inline; padding: 0; margin-left: .35rem; border: 0; background: none;
+  font-size: inherit; font-weight: 500; color: var(--moss);
+  text-decoration: underline; text-decoration-color: var(--cloud); text-underline-offset: 3px;
+}
+.link-button:hover { text-decoration-color: currentColor; }
+.chip-strong { background: var(--paper); color: var(--pine); border-color: var(--paper); font-weight: 600; }
+.lookup-hint { display: block; font-size: .75rem; color: var(--stone); font-weight: 400; }
+.lookup-money .lookup-money-due { font-weight: 600; color: var(--moss); }

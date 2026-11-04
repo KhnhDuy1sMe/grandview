@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500" role="img" aria-label="Suite, ảnh minh họa">
+  <title>Suite, ảnh minh họa</title>
+  <defs><linearGradient id="scrimsuite" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1D2620" stop-opacity=".5"/>
+    <stop offset="1" stop-color="#1D2620" stop-opacity="0"/>
+  </linearGradient></defs>
+  <rect width="1200" height="1500" fill="#2C3A2E"/>
+  <rect x="70" y="70" width="1060" height="880" rx="28" fill="#E8EFD8"/>
+  <clipPath id="wsuite"><rect x="70" y="70" width="1060" height="880" rx="28"/></clipPath>
+  <g clip-path="url(#wsuite)">
+    <circle cx="900" cy="280" r="84" fill="#C9A45C"/>
+    <path d="M0 700 Q 600 530 1200 760 L1200 950 L0 950 Z" fill="#5A6B43"/><path d="M0 800 Q 420 650 1200 830 L1200 950 L0 950 Z" fill="#4F5F3A"/><path d="M0 870 Q 860 690 1200 880 L1200 950 L0 950 Z" fill="#2C3A2E"/>
+    <path d="M240 670 L292.0 770 L188.0 770 Z" fill="#1D2620"/><path d="M330 670 L382.0 770 L278.0 770 Z" fill="#1D2620"/><path d="M880 670 L932.0 770 L828.0 770 Z" fill="#1D2620"/><path d="M960 670 L1012.0 770 L908.0 770 Z" fill="#1D2620"/>
+    <rect x="70" y="70" width="1060" height="360" fill="url(#scrimsuite)"/>
+  </g>
+  <rect x="327.0" y="70" width="16" height="880" fill="#1D2620"/><rect x="592.0" y="70" width="16" height="880" fill="#1D2620"/><rect x="857.0" y="70" width="16" height="880" fill="#1D2620"/>
+  <rect x="70" y="70" width="1060" height="880" rx="28" fill="none" stroke="#1D2620" stroke-width="14"/>
+  <rect x="0" y="1010" width="1200" height="10" fill="#4F5F3A" opacity=".65"/>
+  <path d="M180 1300 q-70 -130 0 -200 q70 70 0 200z" fill="#4F5F3A"/><rect x="150" y="1300" width="60" height="70" rx="12" fill="#5A6B43"/>
+</svg>
